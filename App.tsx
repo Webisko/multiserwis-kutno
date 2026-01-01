@@ -437,7 +437,7 @@ const App = () => {
             <div className="bg-brand-primary p-6 rounded-sm text-white">
               <h3 className="font-heading font-bold text-lg mb-2">Potrzebujesz szkolenia dla firmy?</h3>
               <p className="text-base text-slate-300 mb-4">Przygotujemy indywidualną ofertę dla Twoich pracowników.</p>
-              <button className="w-full py-2 bg-brand-accent text-white text-sm font-bold uppercase rounded-sm hover:bg-brand-accentHover transition-colors">Zapytaj o ofertę</button>
+              <button onClick={() => setCurrentView('contact')} className="w-full py-2 bg-brand-accent text-white text-sm font-bold uppercase rounded-sm hover:bg-brand-accentHover transition-colors">Zapytaj o ofertę</button>
             </div>
           </div>
 
