@@ -3,6 +3,12 @@ import { ViewState, Language } from '../types';
 import { Menu, X, Phone, Mail, GraduationCap, Truck, User, HardHat, ChevronRight, BarChart3, Globe } from 'lucide-react';
 import { TRANSLATIONS } from '../constants';
 
+// Helper function for image paths
+const getImagePath = (filename: string) => {
+  const base = import.meta.env.BASE_URL || '/';
+  return `${base}${filename}`.replace('//', '/');
+};
+
 interface LayoutProps {
   children: React.ReactNode;
   currentView: ViewState;
@@ -86,8 +92,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
             className="flex items-center gap-2 cursor-pointer group" 
             onClick={() => setView('HOME')}
           >
-            <div className="w-10 h-10 bg-brand-accent rounded-sm flex items-center justify-center transform group-hover:rotate-45 transition-transform duration-300">
-              <HardHat className="text-white transform group-hover:-rotate-45 transition-transform duration-300" size={24} />
+            <div className="w-10 h-10 bg-brand-accent rounded-sm flex items-center justify-center transform group-hover:rotate-45 transition-transform duration-300 p-1">
+              <img src={getImagePath('logo.svg')} alt="MultiSerwis Logo" className="w-full h-full scale-[0.85] group-hover:scale-100 transform group-hover:-rotate-45 transition-transform duration-300" />
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-heading font-extrabold text-white leading-none tracking-tight">MULTI<span className="text-brand-accent">SERWIS</span></span>

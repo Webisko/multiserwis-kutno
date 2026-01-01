@@ -1,5 +1,11 @@
 import { Course, Machine, UserCourse, Module, Student, SEOMetadata, Language } from './types';
 
+// Helper function for image paths - works both locally and on GitHub Pages
+const getImagePath = (filename: string) => {
+  const base = import.meta.env.BASE_URL || '/';
+  return `${base}${filename}`.replace('//', '/');
+};
+
 export const TRANSLATIONS = {
   PL: {
     nav: {
@@ -89,7 +95,7 @@ export const COURSES: Course[] = [
     category: 'UDT',
     duration: '35h',
     price: '650 PLN',
-    image: '/multiserwis-kutno/operator-wozki-widlowe.webp',
+    image: getImagePath('operator-wozki-widlowe.webp'),
     isPopular: true,
     description: "Ucz się teorii w domu, przyjedź tylko na egzamin praktyczny. Oszczędź czas i pieniądze dzięki naszej platformie e-learningowej. Gwarantujemy materiały wideo 4K, testy próbne identyczne z państwowymi oraz 100% wsparcia instruktora."
   },
@@ -99,7 +105,7 @@ export const COURSES: Course[] = [
     category: 'UDT',
     duration: '40h',
     price: '850 PLN',
-    image: '/multiserwis-kutno/ladowarki-teleskopowe.webp',
+    image: getImagePath('ladowarki-teleskopowe.webp'),
     isPopular: true,
     description: "Szkolenie na wielozadaniowe nośniki osprzętu. Najbardziej poszukiwane uprawnienia w budownictwie."
   },
@@ -109,7 +115,7 @@ export const COURSES: Course[] = [
     category: 'SEP',
     duration: '8h',
     price: '400 PLN',
-    image: '/multiserwis-kutno/uprawnienia-energetyczne-g1.webp',
+    image: getImagePath('uprawnienia-energetyczne-g1.webp'),
     description: "Kurs przygotowawczy do egzaminu kwalifikacyjnego na stanowisku Eksploatacji."
   },
   {
@@ -118,7 +124,7 @@ export const COURSES: Course[] = [
     category: 'UDT',
     duration: '24h',
     price: '600 PLN',
-    image: '/multiserwis-kutno/suwnice-wciagniki.webp',
+    image: getImagePath('suwnice-wciagniki.webp'),
     description: "Obsługa suwnic sterowanych z poziomu roboczego oraz kabiny."
   }
 ];
@@ -129,21 +135,21 @@ export const MACHINES: Machine[] = [
     name: 'Manitou MRT 2150',
     type: 'Ładowarka Teleskopowa',
     specs: { height: '21m', capacity: '5000kg' },
-    image: '/multiserwis-kutno/manitou-mrt-2150.webp',
+    image: getImagePath('manitou-mrt-2150.webp'),
   },
   {
     id: 'm2',
     name: 'Genie Z-45/25J',
     type: 'Podnośnik Przegubowy',
     specs: { height: '16m', weight: '6500kg' },
-    image: '/multiserwis-kutno/genie-z-4525j.webp',
+    image: getImagePath('genie-z-4525j.webp'),
   },
   {
     id: 'm3',
     name: 'JCB 3CX',
     type: 'Koparko-ładowarka',
     specs: { weight: '8000kg', capacity: '1.2m³' },
-    image: '/multiserwis-kutno/jcb-3cx.webp',
+    image: getImagePath('jcb-3cx.webp'),
   }
 ];
 
