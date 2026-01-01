@@ -11,7 +11,7 @@ export const TRANSLATIONS = {
       lms: 'Strefa Kursanta'
     },
     hero: {
-      badge: 'Nowe terminy szkoleń 2024',
+      badge: 'Nowe terminy szkoleń 2026',
       title: 'Zdobądź uprawnienia operatora',
       subtitle: 'online i stacjonarnie',
       desc: 'Kompleksowe kursy UDT z dostępem do teorii w e-learningu. Praktyka na nowoczesnym sprzęcie.',
@@ -29,7 +29,7 @@ export const TRANSLATIONS = {
       lms: 'Student Zone'
     },
     hero: {
-      badge: 'New training dates 2024',
+      badge: 'New training dates 2026',
       title: 'Get operator certification',
       subtitle: 'online and on-site',
       desc: 'Comprehensive UDT courses with e-learning theory access. Practice on modern equipment.',
@@ -47,7 +47,7 @@ export const TRANSLATIONS = {
       lms: 'Studentenzone'
     },
     hero: {
-      badge: 'Neue Schulungstermine 2024',
+      badge: 'Neue Schulungstermine 2026',
       title: 'Holen Sie sich das Zertifikat',
       subtitle: 'online und vor Ort',
       desc: 'Umfassende UDT-Kurse mit Zugang zur E-Learning-Theorie. Praxis an modernen Geräten.',

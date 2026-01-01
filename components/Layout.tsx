@@ -326,7 +326,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
 
         </div>
         <div className="max-w-7xl mx-auto px-4 md:px-8 mt-16 pt-8 border-t border-brand-secondary/30 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
-          <p>&copy; 2024 MultiSerwis. Wszelkie prawa zastrzeżone.</p>
+          <p>&copy; 2026 MultiSerwis. Wszelkie prawa zastrzeżone.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <span className="hover:text-white cursor-pointer">Polityka Prywatności</span>
             <span className="hover:text-white cursor-pointer">Regulamin</span>
