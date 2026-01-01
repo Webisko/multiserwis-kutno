@@ -3414,12 +3414,9 @@ const App = () => {
           {/* Sidebar */}
           <div className="space-y-6">
              <div className="bg-brand-primary text-white p-6 rounded-sm shadow-lg">
-                <div className="flex items-center gap-4 mb-6">
-                   <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center font-bold text-xl">JK</div>
-                   <div>
-                     <div className="font-bold">Jan Kowalski</div>
-                     <div className="text-xs text-brand-accent uppercase">Operator UDT</div>
-                   </div>
+                <div className="mb-6">
+                   <div className="font-bold text-lg">Jan Kowalski</div>
+                   <div className="text-xs text-brand-accent uppercase">ABC Transport Sp. z o.o.</div>
                 </div>
                 <div className="space-y-3">
                    <div className="flex justify-between text-sm py-2 border-b border-white/10">
