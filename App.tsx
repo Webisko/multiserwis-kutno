@@ -93,7 +93,7 @@ const App = () => {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/hero.webp"
+            src={`${import.meta.env.BASE_URL}hero.webp`}
             alt="Workers with UDT Equipment" 
             className="w-full h-full object-cover opacity-50"
           />
@@ -191,7 +191,7 @@ const App = () => {
                 </div>
                 <div className="absolute inset-0 bg-brand-dark/10 group-hover:bg-brand-dark/0 transition-colors z-10"></div>
                 <img 
-                  src="/operator-wozki-widlowe.webp" 
+                  src={`${import.meta.env.BASE_URL}operator-wozki-widlowe.webp`} 
                   alt="Wózki Widłowe" 
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
@@ -225,7 +225,7 @@ const App = () => {
                 </div>
                 <div className="absolute inset-0 bg-brand-dark/10 group-hover:bg-brand-dark/0 transition-colors z-10"></div>
                 <img 
-                  src="/ladowarki-teleskopowe.webp" 
+                  src={`${import.meta.env.BASE_URL}ladowarki-teleskopowe.webp`} 
                   alt="Ładowarki Teleskopowe" 
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
@@ -255,7 +255,7 @@ const App = () => {
                 </div>
                 <div className="absolute inset-0 bg-brand-dark/10 group-hover:bg-brand-dark/0 transition-colors z-10"></div>
                 <img 
-                  src="/koparki.webp" 
+                  src={`${import.meta.env.BASE_URL}koparki.webp`} 
                   alt="Koparki" 
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
@@ -291,7 +291,7 @@ const App = () => {
             >
               <div className="md:w-2/5 relative min-h-[200px]">
                 <img 
-                  src="/wynajem-maszyn.webp" 
+                  src={`${import.meta.env.BASE_URL}wynajem-maszyn.webp`} 
                   alt="Wynajem" 
                   className="absolute inset-0 w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
                 />
@@ -317,7 +317,7 @@ const App = () => {
             >
               <div className="md:w-2/5 relative min-h-[200px]">
                 <img 
-                  src="/serwis-i-koserwacja.webp" 
+                  src={`${import.meta.env.BASE_URL}serwis-i-koserwacja.webp`} 
                   alt="Serwis" 
                   className="absolute inset-0 w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
                 />
@@ -922,7 +922,7 @@ const App = () => {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <img 
-              src="/serwis-i-koserwacja.webp" 
+              src={`${import.meta.env.BASE_URL}serwis-i-koserwacja.webp`} 
               alt="Usługi serwisowe" 
               className="w-full h-full object-cover opacity-50"
             />
