@@ -38,7 +38,8 @@ import {
   X,
   Trash2,
   Edit,
-  Eye
+  Eye,
+  User
 } from 'lucide-react';
 
 const App = () => {
@@ -56,6 +57,9 @@ const App = () => {
   const [quizAnswers, setQuizAnswers] = useState<{ [key: string]: number | number[] | string }>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
   const [openAccordionIndex, setOpenAccordionIndex] = useState<number | null>(null);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [showLessonModal, setShowLessonModal] = useState(false);
+  const [showModuleModal, setShowModuleModal] = useState(false);
 
   // --- SEO LOGIC ---
   const [currentSEO, setCurrentSEO] = useState<SEOMetadata | null>(null);
@@ -3691,6 +3695,12 @@ const App = () => {
                      <span className="font-bold text-green-400">2026</span>
                    </div>
                 </div>
+                <button 
+                  onClick={() => setShowProfileEdit(true)}
+                  className="w-full mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-sm text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                >
+                  <User size={16} /> Edytuj profil
+                </button>
              </div>
 
              <div className="bg-white p-6 rounded-sm shadow-sm border border-slate-100">
@@ -3709,6 +3719,125 @@ const App = () => {
              </div>
           </div>
         </div>
+
+        {/* Modal edycji profilu */}
+        {showProfileEdit && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex justify-between items-center">
+                <h3 className="text-2xl font-heading font-bold text-brand-dark">Mój Profil</h3>
+                <button
+                  onClick={() => setShowProfileEdit(false)}
+                  className="text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-6">
+                {/* Dane osobowe */}
+                <div>
+                  <h4 className="text-lg font-bold text-brand-dark mb-4 flex items-center gap-2">
+                    <User size={18} className="text-brand-accent" /> Dane osobowe
+                  </h4>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Imię</label>
+                        <input
+                          type="text"
+                          defaultValue="Jan"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Nazwisko</label>
+                        <input
+                          type="text"
+                          defaultValue="Kowalski"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Email</label>
+                      <input
+                        type="email"
+                        defaultValue="jan.kowalski@abc-transport.pl"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Firma</label>
+                      <input
+                        type="text"
+                        defaultValue="ABC Transport Sp. z o.o."
+                        className="w-full px-4 py-3 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent transition-colors bg-slate-50"
+                        disabled
+                      />
+                      <p className="text-xs text-slate-500 mt-1">Zmiana firmy wymaga kontaktu z administratorem</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Zmiana hasła */}
+                <div className="pt-6 border-t border-slate-200">
+                  <h4 className="text-lg font-bold text-brand-dark mb-4 flex items-center gap-2">
+                    <Lock size={18} className="text-brand-accent" /> Zmiana hasła
+                  </h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Obecne hasło</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Nowe hasło</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">Powtórz nowe hasło</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Przyciski */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => {
+                      // Tutaj logika zapisu
+                      alert('Dane zostały zapisane!');
+                      setShowProfileEdit(false);
+                    }}
+                    className="flex-1 px-6 py-3 bg-brand-primary text-white font-bold rounded-sm hover:bg-brand-dark transition-colors"
+                  >
+                    Zapisz zmiany
+                  </button>
+                  <button
+                    onClick={() => setShowProfileEdit(false)}
+                    className="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-sm hover:bg-slate-300 transition-colors"
+                  >
+                    Anuluj
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
