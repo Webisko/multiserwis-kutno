@@ -55,9 +55,15 @@ const App = () => {
   const [adminActiveTab, setAdminActiveTab] = useState<'dashboard' | 'courses' | 'students'>('dashboard');
   const [quizAnswers, setQuizAnswers] = useState<{ [key: string]: number | number[] | string }>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
+  const [openAccordionIndex, setOpenAccordionIndex] = useState<number | null>(null);
 
   // --- SEO LOGIC ---
   const [currentSEO, setCurrentSEO] = useState<SEOMetadata | null>(null);
+
+  // Reset accordion when course changes
+  useEffect(() => {
+    setOpenAccordionIndex(null);
+  }, [selectedCourseId]);
 
   useEffect(() => {
     // Basic Title update
@@ -72,6 +78,225 @@ const App = () => {
   }, [currentView, language]);
 
   const t = TRANSLATIONS[language];
+
+  // Get program details for each course
+  const getCourseProgram = (courseId: string) => {
+    const programs: { [key: string]: { title: string; details: string[] }[] } = {
+      'c1': [
+        {
+          title: 'Bezpieczeństwo pracy',
+          details: [
+            'BHP w zakresie obsługi wózków widłowych',
+            'Zasady poruszania się po placu manewrowym i w magazynie',
+            'Bezpieczne techniki podnoszenia i transportu ładunków',
+            'Procedury awaryjne i zasady postępowania w sytuacjach niebezpiecznych',
+            'Środki ochrony indywidualnej operatora'
+          ]
+        },
+        {
+          title: 'Obsługa maszyn',
+          details: [
+            'Budowa i zasada działania wózka widłowego',
+            'Codzienne czynności kontrolne przed rozpoczęciem pracy',
+            'Prawidłowa technika jazdy i manewrowania',
+            'Obsługa układu hydraulicznego i mechanizmu podnoszenia',
+            'Wymiana butli gazowych (dla wózków LPG)'
+          ]
+        },
+        {
+          title: 'Przepisy UDT',
+          details: [
+            'Ustawa o dozorze technicznym - zakres i interpretacja',
+            'Wymagania techniczne dla wózków jezdniowych',
+            'Przeglądy okresowe i dokumentacja eksploatacyjna',
+            'Obowiązki operatora i pracodawcy według przepisów UDT',
+            'Odpowiedzialność prawna w przypadku wykroczeń'
+          ]
+        },
+        {
+          title: 'Praktyka na placu manewrowym',
+          details: [
+            'Jazda slalomem i jazda tyłem',
+            'Precyzyjne ustawianie wideł i manipulacja ładunkiem',
+            'Układanie palet na różnych wysokościach',
+            'Jazda z ładunkiem po pochylni i nierównym terenie',
+            'Wykonanie parkingu i bezpieczne pozostawienie wózka',
+            'Praktyka trwa minimum 20 godzin pod okiem instruktora'
+          ]
+        },
+        {
+          title: 'Przygotowanie do egzaminu',
+          details: [
+            'Omówienie struktury egzaminu państwowego UDT',
+            'Test próbny z pytań teoretycznych (identyczny z państwowym)',
+            'Symulacja egzaminu praktycznego',
+            'Najczęstsze błędy i jak ich unikać',
+            'Wskazówki dotyczące dokumentacji egzaminacyjnej'
+          ]
+        }
+      ],
+      'c2': [
+        {
+          title: 'Bezpieczeństwo pracy',
+          details: [
+            'BHP przy pracy z ładowarkami teleskopowymi',
+            'Bezpieczna praca na wysokościach',
+            'Ocena warunków gruntu i stabilności maszyny',
+            'Zasady bezpiecznej wymiany osprzętu',
+            'Procedury awaryjne i ewakuacja z kabiny'
+          ]
+        },
+        {
+          title: 'Obsługa maszyn',
+          details: [
+            'Budowa i elementy ładowarki teleskopowej',
+            'System hydrauliczny i sterowanie proporcjonalne',
+            'Obsługa wysięgnika teleskopowego i mechanizmów',
+            'Montaż i demontaż różnych rodzajów osprzętu (widelce, łyżka, kosz)',
+            'Codzienne kontrole i konserwacja podstawowa'
+          ]
+        },
+        {
+          title: 'Przepisy UDT',
+          details: [
+            'Przepisy UDT dla wielozadaniowych nośników osprzętu',
+            'Wymagania dla operatorów ładowarek teleskopowych',
+            'Dokumentacja techniczna i książka maszyny',
+            'Przeglądy i badania techniczne',
+            'Certyfikacja osprzętu zamiennego'
+          ]
+        },
+        {
+          title: 'Praktyka na placu manewrowym',
+          details: [
+            'Jazda z wysięgnikiem w różnych pozycjach',
+            'Praca na wysokościach z koszem osobowym',
+            'Załadunek i manipulacja materiałami budowlanymi',
+            'Precyzyjna praca łyżką przy robotach ziemnych',
+            'Transport ładunków na terenie nierównym i pochyłym',
+            'Szkolenie trwa 40 godzin, w tym 30 godzin praktyki'
+          ]
+        },
+        {
+          title: 'Przygotowanie do egzaminu',
+          details: [
+            'Testy przykładowe zgodne z wymaganiami UDT',
+            'Symulacja egzaminu praktycznego z każdym rodzajem osprzętu',
+            'Przegląd najważniejszych zagadnień technicznych',
+            'Analiza typowych błędów egzaminacyjnych',
+            'Wsparcie instruktora do dnia egzaminu'
+          ]
+        }
+      ],
+      'c3': [
+        {
+          title: 'Bezpieczeństwo pracy',
+          details: [
+            'Podstawy BHP w energetyce',
+            'Bezpieczna praca przy urządzeniach elektrycznych',
+            'Pierwsza pomoc przy porażeniu prądem',
+            'Zasady pracy w strefach zagrożonych',
+            'Środki ochrony indywidualnej w energetyce'
+          ]
+        },
+        {
+          title: 'Obsługa urządzeń',
+          details: [
+            'Obsługa tablic rozdzielczych i aparatury sterowniczej',
+            'Identyfikacja i lokalizacja usterek',
+            'Podstawowe pomiary elektryczne',
+            'Zasady konserwacji urządzeń elektrycznych',
+            'Protokoły eksploatacji i dokumentacja'
+          ]
+        },
+        {
+          title: 'Przepisy elektroenergetyczne',
+          details: [
+            'Przepisy eksploatacji urządzeń elektroenergetycznych',
+            'Normy i standardy branżowe SEP',
+            'Wymagania dla personelu eksploatacyjnego',
+            'Dokumentacja techniczna i eksploatacyjna',
+            'Odpowiedzialność prawna i ubezpieczenia'
+          ]
+        },
+        {
+          title: 'Teoria elektryczności',
+          details: [
+            'Podstawowe pojęcia i prawa elektryczności',
+            'Rodzaje prądów i napięć',
+            'Układy jednofazowe i trójfazowe',
+            'Ochrona przeciwporażeniowa',
+            'Interpretacja schematów elektrycznych'
+          ]
+        },
+        {
+          title: 'Przygotowanie do egzaminu',
+          details: [
+            'Omówienie wymagań egzaminu kwalifikacyjnego SEP',
+            'Testy próbne z zakresu G1',
+            'Analiza najczęstszych pytań egzaminacyjnych',
+            'Powtórka kluczowych zagadnień',
+            'Wskazówki odnośnie przebiegu egzaminu'
+          ]
+        }
+      ],
+      'c4': [
+        {
+          title: 'Bezpieczeństwo pracy',
+          details: [
+            'BHP przy obsłudze suwnic i wciągników',
+            'Bezpieczne techniki podnoszenia ciężarów',
+            'Sygnalizacja i komunikacja z nawiązywaczem',
+            'Zasady podczepiania i odczepiania ładunków',
+            'Procedury awaryjne przy uszkodzeniu urządzenia'
+          ]
+        },
+        {
+          title: 'Obsługa maszyn',
+          details: [
+            'Budowa i rodzaje suwnic (pomostowe, bramowe, obrotowe)',
+            'Obsługa wciągników elektrycznych i ręcznych',
+            'Sterowanie z poziomu roboczego i z kabiny',
+            'Obsługa mechanizmów jazdy i podnoszenia',
+            'Kontrola stanu technicznego przed rozpoczęciem pracy'
+          ]
+        },
+        {
+          title: 'Przepisy UDT',
+          details: [
+            'Przepisy dozoru technicznego dla dźwignic',
+            'Wymagania dla operatorów suwnic kategorii II',
+            'Dokumentacja eksploatacyjna i badania techniczne',
+            'Przeglądy okresowe i roczne',
+            'Obowiązki operatora zgodnie z przepisami UDT'
+          ]
+        },
+        {
+          title: 'Praktyka na hali produkcyjnej',
+          details: [
+            'Jazda suwnicą z ładunkiem i bez ładunku',
+            'Precyzyjne ustawienie ładunku w wyznaczonych miejscach',
+            'Obsługa różnych rodzajów zawiesi i haków',
+            'Współpraca z nawiązywaczem - sygnały i komunikacja',
+            'Wykonanie manewrów awaryjnych',
+            'Szkolenie praktyczne trwa minimum 16 godzin'
+          ]
+        },
+        {
+          title: 'Przygotowanie do egzaminu',
+          details: [
+            'Struktura egzaminu UDT dla operatorów dźwignic',
+            'Testy próbne - część teoretyczna',
+            'Symulacja części praktycznej egzaminu',
+            'Omówienie typowych błędów na egzaminie',
+            'Dokumentacja wymagana w dniu egzaminu'
+          ]
+        }
+      ]
+    };
+
+    return programs[courseId] || programs['c1'];
+  };
 
   // --- SUB-COMPONENTS ---
 
@@ -671,13 +896,37 @@ const App = () => {
                 {/* Program */}
                 <div>
                   <h2 className="text-3xl font-heading font-bold text-brand-primary mb-6">Program szkolenia</h2>
-                  <div className="space-y-4">
-                    {['Bezpieczeństwo pracy', 'Obsługa maszyn', 'Przepisy UDT', 'Praktyka na placu manewrowym', 'Przygotowanie do egzaminu'].map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-4 bg-white p-4 rounded-sm border-l-4 border-brand-accent">
-                        <div className="w-8 h-8 rounded-full bg-brand-accent text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-                          {idx + 1}
-                        </div>
-                        <span className="text-slate-700 font-medium pt-1">{item}</span>
+                  <div className="space-y-3">
+                    {getCourseProgram(course.id).map((item, idx) => (
+                      <div key={idx} className="bg-white rounded-sm border border-slate-200 overflow-hidden">
+                        <button
+                          onClick={() => setOpenAccordionIndex(openAccordionIndex === idx ? null : idx)}
+                          className="w-full flex items-center justify-between gap-4 p-5 hover:bg-slate-50 transition-colors"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-brand-accent text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                              {idx + 1}
+                            </div>
+                            <span className="text-slate-700 font-bold text-left">{item.title}</span>
+                          </div>
+                          {openAccordionIndex === idx ? (
+                            <ChevronUp className="text-brand-accent flex-shrink-0" size={24} />
+                          ) : (
+                            <ChevronDown className="text-slate-400 flex-shrink-0" size={24} />
+                          )}
+                        </button>
+                        {openAccordionIndex === idx && (
+                          <div className="px-5 pb-5 pt-2 bg-slate-50 border-t border-slate-200">
+                            <ul className="space-y-2.5 ml-14">
+                              {item.details.map((detail, detailIdx) => (
+                                <li key={detailIdx} className="flex items-start gap-3 text-slate-600">
+                                  <CheckCircle size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
+                                  <span className="text-sm leading-relaxed">{detail}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
