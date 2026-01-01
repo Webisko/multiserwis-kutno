@@ -4,11 +4,13 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
+    const isProduction = mode === 'production';
+    
     return {
-      base: '/multiserwis-kutno/',
+      base: isProduction ? '/multiserwis-kutno/' : '/',
       server: {
         port: 3000,
-        host: '0.0.0.0',
+        host: '0.0.0.0'
       },
       build: {
         outDir: 'docs'

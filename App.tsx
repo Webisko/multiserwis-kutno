@@ -408,7 +408,7 @@ const App = () => {
                 setSelectedCourseId('c1');
                 setView('COURSE_DETAIL');
               }}
-              className="group bg-white rounded-sm shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+              className="group bg-white rounded-sm shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer flex flex-col"
             >
               <div className="relative h-64 overflow-hidden">
                 <div className="absolute top-4 right-4 z-20 bg-green-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wide flex items-center gap-1 shadow-lg">
@@ -421,9 +421,9 @@ const App = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-              <div className="p-8">
+              <div className="p-8 flex flex-col flex-grow">
                 <h3 className="text-2xl font-heading font-bold text-brand-dark mb-3 group-hover:text-brand-accent transition-colors">Wózki Widłowe (I WJO)</h3>
-                <p className="text-slate-600 text-base mb-6 leading-relaxed">
+                <p className="text-slate-600 text-base mb-6 leading-relaxed flex-grow">
                    {/* Specific Sales Copy Highlight */}
                    <span className="font-bold text-brand-primary block mb-2">
                      Ucz się teorii w domu, przyjedź tylko na egzamin praktyczny!
@@ -442,7 +442,7 @@ const App = () => {
                 setSelectedCourseId('c2');
                 setView('COURSE_DETAIL');
               }}
-              className="group bg-white rounded-sm shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+              className="group bg-white rounded-sm shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer flex flex-col"
             >
               <div className="relative h-64 overflow-hidden">
                 <div className="absolute top-4 right-4 z-20 bg-green-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wide flex items-center gap-1 shadow-lg">
@@ -455,9 +455,9 @@ const App = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-              <div className="p-8">
+              <div className="p-8 flex flex-col flex-grow">
                 <h3 className="text-2xl font-heading font-bold text-brand-dark mb-3 group-hover:text-brand-accent transition-colors">Ładowarki Teleskopowe</h3>
-                <p className="text-slate-600 text-base mb-6 leading-relaxed">
+                <p className="text-slate-600 text-base mb-6 leading-relaxed flex-grow">
                   Szkolenie na wielozadaniowe nośniki osprzętu. Najbardziej poszukiwane uprawnienia w budownictwie.
                 </p>
                 <div className="flex items-center text-brand-accent font-bold text-sm uppercase tracking-wider group-hover:translate-x-2 transition-transform">
@@ -472,7 +472,7 @@ const App = () => {
                 setSelectedCourseId('c3');
                 setView('COURSE_DETAIL');
               }}
-              className="group bg-white rounded-sm shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+              className="group bg-white rounded-sm shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer flex flex-col"
             >
               <div className="relative h-64 overflow-hidden">
                 <div className="absolute top-4 right-4 z-20 bg-brand-accent text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wide flex items-center gap-1 shadow-lg">
@@ -485,9 +485,9 @@ const App = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-              <div className="p-8">
+              <div className="p-8 flex flex-col flex-grow">
                 <h3 className="text-2xl font-heading font-bold text-brand-dark mb-3 group-hover:text-brand-accent transition-colors">Koparko-Ładowarki</h3>
-                <p className="text-slate-600 text-base mb-6 leading-relaxed">
+                <p className="text-slate-600 text-base mb-6 leading-relaxed flex-grow">
                   Obsługa maszyn do robót ziemnych kl. III. Praktyka na placu manewrowym w Kutnie.
                 </p>
                 <div className="flex items-center text-brand-accent font-bold text-sm uppercase tracking-wider group-hover:translate-x-2 transition-transform">
@@ -898,7 +898,7 @@ const App = () => {
                   <h2 className="text-3xl font-heading font-bold text-brand-primary mb-6">Program szkolenia</h2>
                   <div className="space-y-3">
                     {getCourseProgram(course.id).map((item, idx) => (
-                      <div key={idx} className="bg-white rounded-sm border border-slate-200 overflow-hidden transition-all duration-300">
+                      <div key={idx} className="bg-white rounded-sm border border-slate-200">
                         <button
                           onClick={() => setOpenAccordionIndex(openAccordionIndex === idx ? null : idx)}
                           className="w-full flex items-center justify-between gap-4 p-5 hover:bg-slate-50 transition-colors"
@@ -910,28 +910,31 @@ const App = () => {
                             <span className="text-slate-700 font-bold text-left">{item.title}</span>
                           </div>
                           <ChevronDown 
-                            className={`flex-shrink-0 transition-transform duration-300 ${openAccordionIndex === idx ? 'rotate-180 text-brand-accent' : 'text-slate-400'}`}
+                            style={{
+                              transform: openAccordionIndex === idx ? 'rotate(180deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.5s ease-in-out'
+                            }}
+                            className={`flex-shrink-0 ${openAccordionIndex === idx ? 'text-brand-accent' : 'text-slate-400'}`}
                             size={24} 
                           />
                         </button>
                         <div 
                           style={{
-                            display: 'grid',
-                            gridTemplateRows: openAccordionIndex === idx ? '1fr' : '0fr',
-                            transition: 'grid-template-rows 0.3s ease-in-out'
+                            maxHeight: openAccordionIndex === idx ? '500px' : '0px',
+                            opacity: openAccordionIndex === idx ? 1 : 0,
+                            transition: 'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
+                            overflow: 'hidden'
                           }}
                         >
-                          <div style={{ overflow: 'hidden' }}>
-                            <div className="px-5 pb-5 pt-2 bg-slate-50 border-t border-slate-200">
-                              <ul className="space-y-2.5 ml-14">
-                                {item.details.map((detail, detailIdx) => (
-                                  <li key={detailIdx} className="flex items-start gap-3 text-slate-600">
-                                    <CheckCircle size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
-                                    <span className="text-sm leading-relaxed">{detail}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
+                          <div className="px-5 pb-5 pt-3 bg-slate-50 border-t border-slate-200">
+                            <ul className="space-y-2.5 ml-14">
+                              {item.details.map((detail, detailIdx) => (
+                                <li key={detailIdx} className="flex items-start gap-3 text-slate-600">
+                                  <CheckCircle size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
+                                  <span className="text-sm leading-relaxed">{detail}</span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
                         </div>
                       </div>
