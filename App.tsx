@@ -898,7 +898,7 @@ const App = () => {
                   <h2 className="text-3xl font-heading font-bold text-brand-primary mb-6">Program szkolenia</h2>
                   <div className="space-y-3">
                     {getCourseProgram(course.id).map((item, idx) => (
-                      <div key={idx} className="bg-white rounded-sm border border-slate-200 overflow-hidden">
+                      <div key={idx} className="bg-white rounded-sm border border-slate-200 overflow-hidden transition-all duration-300">
                         <button
                           onClick={() => setOpenAccordionIndex(openAccordionIndex === idx ? null : idx)}
                           className="w-full flex items-center justify-between gap-4 p-5 hover:bg-slate-50 transition-colors"
@@ -910,24 +910,28 @@ const App = () => {
                             <span className="text-slate-700 font-bold text-left">{item.title}</span>
                           </div>
                           <ChevronDown 
-                            className={`flex-shrink-0 transition-all duration-300 ${openAccordionIndex === idx ? 'rotate-180 text-brand-accent' : 'text-slate-400'}`}
+                            className={`flex-shrink-0 transition-transform duration-300 ${openAccordionIndex === idx ? 'rotate-180 text-brand-accent' : 'text-slate-400'}`}
                             size={24} 
                           />
                         </button>
                         <div 
-                          className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                            openAccordionIndex === idx ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
-                          }`}
+                          style={{
+                            display: 'grid',
+                            gridTemplateRows: openAccordionIndex === idx ? '1fr' : '0fr',
+                            transition: 'grid-template-rows 0.3s ease-in-out'
+                          }}
                         >
-                          <div className="px-5 pb-5 pt-2 bg-slate-50 border-t border-slate-200">
-                            <ul className="space-y-2.5 ml-14">
-                              {item.details.map((detail, detailIdx) => (
-                                <li key={detailIdx} className="flex items-start gap-3 text-slate-600">
-                                  <CheckCircle size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
-                                  <span className="text-sm leading-relaxed">{detail}</span>
-                                </li>
-                              ))}
-                            </ul>
+                          <div style={{ overflow: 'hidden' }}>
+                            <div className="px-5 pb-5 pt-2 bg-slate-50 border-t border-slate-200">
+                              <ul className="space-y-2.5 ml-14">
+                                {item.details.map((detail, detailIdx) => (
+                                  <li key={detailIdx} className="flex items-start gap-3 text-slate-600">
+                                    <CheckCircle size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
+                                    <span className="text-sm leading-relaxed">{detail}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                           </div>
                         </div>
                       </div>
