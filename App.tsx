@@ -3416,7 +3416,7 @@ const App = () => {
              <div className="bg-brand-primary text-white p-6 rounded-sm shadow-lg">
                 <div className="mb-6">
                    <div className="font-bold text-lg">Jan Kowalski</div>
-                   <div className="text-xs text-brand-accent uppercase">ABC Transport Sp. z o.o.</div>
+                   <div className="text-sm text-slate-300">ABC Transport Sp. z o.o.</div>
                 </div>
                 <div className="space-y-3">
                    <div className="flex justify-between text-sm py-2 border-b border-white/10">
