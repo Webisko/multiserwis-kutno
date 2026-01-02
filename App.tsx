@@ -1787,7 +1787,7 @@ const App = () => {
             )}
 
             {currentLesson?.type !== 'quiz' && (
-            <div className="flex justify-between mt-4">
+            <div className="flex flex-col md:flex-row gap-3 mt-6 md:justify-between">
               <button 
                 onClick={goToPreviousLesson}
                 disabled={!hasPrevious}
@@ -1799,10 +1799,37 @@ const App = () => {
               >
                  Poprzednia lekcja
               </button>
+              
+              {!currentLesson?.isCompleted ? (
+                <button 
+                  onClick={() => {
+                    // Oznacz lekcję jako ukończoną
+                    const moduleIndex = COURSE_CURRICULUM.findIndex(m => 
+                      m.lessons.some(l => l.id === currentLesson?.id)
+                    );
+                    if (moduleIndex !== -1) {
+                      const lessonIndex = COURSE_CURRICULUM[moduleIndex].lessons.findIndex(l => l.id === currentLesson?.id);
+                      if (lessonIndex !== -1) {
+                        COURSE_CURRICULUM[moduleIndex].lessons[lessonIndex].isCompleted = true;
+                        // Wymuszenie re-render przez zmianę stanu
+                        setCurrentLessonId(currentLesson?.id || '');
+                      }
+                    }
+                  }}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white font-bold uppercase text-xs rounded-sm hover:bg-green-700 transition-colors md:order-2"
+                >
+                  <CheckCircle size={16} /> Oznacz jako ukończona
+                </button>
+              ) : (
+                <div className="flex items-center justify-center gap-2 px-6 py-3 bg-green-50 text-green-700 font-bold uppercase text-xs rounded-sm md:order-2">
+                  <CheckCircle size={16} /> Lekcja ukończona
+                </div>
+              )}
+              
               <button 
                 onClick={goToNextLesson}
                 disabled={!hasNext}
-                className={`px-6 py-3 bg-brand-accent font-bold uppercase text-xs rounded-sm transition-colors flex items-center gap-2 ${
+                className={`px-6 py-3 bg-brand-accent font-bold uppercase text-xs rounded-sm transition-colors flex items-center justify-center gap-2 md:order-3 ${
                   hasNext 
                     ? 'text-white hover:bg-brand-accentHover cursor-pointer' 
                     : 'bg-slate-300 text-slate-400 cursor-not-allowed'
@@ -1818,9 +1845,10 @@ const App = () => {
           {/* Sidebar - Right/Bottom on mobile */}
           <div className={`
              w-full md:w-1/4 flex-shrink-0 bg-white border border-slate-200 shadow-sm rounded-sm order-1 md:order-2
-             ${sidebarOpen ? 'block' : 'hidden md:block'}
+             md:sticky md:top-20 md:max-h-[calc(100vh-6rem)] md:overflow-hidden md:flex md:flex-col
+             ${sidebarOpen ? 'block' : 'hidden md:flex'}
           `}>
-             <div className="p-4 bg-brand-primary text-white rounded-t-sm">
+             <div className="p-4 bg-brand-primary text-white rounded-t-sm flex-shrink-0">
                 <div className="text-xs font-bold uppercase text-brand-accent tracking-widest mb-1">Twój postęp</div>
                 <div className="flex justify-between items-end mb-2">
                    <span className="text-2xl font-heading font-bold">45%</span>
@@ -1831,7 +1859,7 @@ const App = () => {
                 </div>
              </div>
 
-             <div>
+             <div className="overflow-y-auto flex-1">
                 {COURSE_CURRICULUM.map((module) => (
                    <div key={module.id} className="border-b border-slate-100 last:border-0">
                       <div className="bg-slate-50 px-4 py-3 text-xs font-bold uppercase text-slate-600 tracking-wider flex justify-between items-center sticky top-0 z-10 border-b border-slate-200">
@@ -3846,6 +3874,21 @@ const App = () => {
                   <div className="flex gap-3">
                     <button 
                       onClick={() => {
+                        // Znajdź pierwszą nieukończoną lekcję
+                        let firstIncompleteLesson = null;
+                        for (const module of COURSE_CURRICULUM) {
+                          const incompleteLesson = module.lessons.find(lesson => !lesson.isCompleted);
+                          if (incompleteLesson) {
+                            firstIncompleteLesson = incompleteLesson;
+                            break;
+                          }
+                        }
+                        
+                        // Jeśli znaleziono nieukończoną lekcję, ustaw ją jako aktywną
+                        if (firstIncompleteLesson) {
+                          setCurrentLessonId(firstIncompleteLesson.id);
+                        }
+                        
                         setIsFromAdmin(false);
                         setView('LESSON_PLAYER');
                       }}
