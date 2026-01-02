@@ -175,22 +175,12 @@ export const COURSE_CURRICULUM: Module[] = [
   {
     id: 'c1m1',
     courseId: 'c1',
-    title: 'Moduł 1: Budowa Wózka Widłowego',
+    title: 'Moduł 1: Budowa i Zasady Pracy',
     lessons: [
-      { id: 'c1l1', title: 'Wprowadzenie i typy wózków', duration: '15:00', isCompleted: true, isLocked: false, type: 'video' },
-      { id: 'c1l2', title: 'Układ napędowy i jezdny', duration: '22:30', isCompleted: true, isLocked: false, type: 'video' },
-      { id: 'c1l3', title: 'Mechanizm podnoszenia', duration: '18:45', isCompleted: true, isLocked: false, type: 'video' },
-    ]
-  },
-  {
-    id: 'c1m2',
-    courseId: 'c1',
-    title: 'Moduł 2: Eksploatacja i Bezpieczeństwo',
-    lessons: [
-      { id: 'c1l4', title: 'Czynności przed rozpoczęciem pracy', duration: '12:00', isCompleted: true, isLocked: false, type: 'video' },
-      { id: 'c1l5', title: 'Bezpieczeństwo wymiany butli LPG', duration: '25:00', isCompleted: false, isLocked: false, type: 'video' },
-      { id: 'c1l6', title: 'Diagram udźwigu - czytanie wykresów', duration: '30:00', isCompleted: false, isLocked: false, type: 'video' },
-      { id: 'c1l7', title: 'Test wiedzy - Moduł 2', duration: '15 pytań', isCompleted: false, isLocked: false, type: 'quiz', questions: [
+      { id: 'c1l1', title: 'Wprowadzenie i typy wózków widłowych', duration: '15:00', isCompleted: true, isLocked: false, type: 'video' },
+      { id: 'c1l2', title: 'Układ napędowy i mechanizm podnoszenia', duration: '22:30', isCompleted: true, isLocked: false, type: 'video' },
+      { id: 'c1l6a', title: 'Przepisy BHP i normy bezpieczeństwa', duration: '8:00', isCompleted: false, isLocked: false, type: 'text' },
+      { id: 'c1l7', title: 'Test wiedzy - Moduł 1', duration: '8 pytań', isCompleted: false, isLocked: false, type: 'test', questions: [
         {
           id: 'q1',
           question: 'Jakie bezpieczeństwo jest najważniejsze przy wymianie butli LPG?',
@@ -203,23 +193,58 @@ export const COURSE_CURRICULUM: Module[] = [
           id: 'q2',
           question: 'Wybierz wszystkie czynności, które należy wykonać przed rozpoczęciem pracy:',
           type: 'multiple',
-          options: ['Sprawdzić hamulce', 'Sprawdzić życzliwości operatora', 'Sprawdzić widoczność', 'Sprawdzić opony', 'Zapalić świecę'],
+          options: ['Sprawdzić hamulce', 'Sprawdzić stan psychiczny operatora', 'Sprawdzić widoczność', 'Sprawdzić opony', 'Zatankować paliwo'],
           correctAnswer: [0, 2, 3],
-          explanation: 'Należy sprawdzić hamulce, widoczność i opony. Życzliwości i świece nie są częścią kontroli przedstartu.'
+          explanation: 'Należy sprawdzić hamulce, widoczność i opony. Stan psychiczny i tankowanie nie są częścią rutynowej kontroli przedstartowej.'
         },
         {
           id: 'q3',
           question: 'Opisz procedurę bezpiecznego zatrzymania wózka widłowego:',
           type: 'open',
-          explanation: 'Prawidłowa odpowiedź powinna zawierać: redukcję prędkości, płynne hamowanie, obniżenie ładunku i wyłączenie silnika.'
+          explanation: 'Prawidłowa odpowiedź powinna zawierać: redukcję prędkości, płynne hamowanie, obniżenie ładunku do poziomu jazdy i wyłączenie silnika.'
         },
         {
           id: 'q4',
-          question: 'Ile wynosi maksymalny kąt nachylenia terenu, na którym można pracować wózkiem widłowym?',
+          question: 'Ile wynosi maksymalny kąt nachylenia terenu, na którym można bezpiecznie pracować wózkiem widłowym?',
           type: 'single',
           options: ['5 stopni', '10 stopni', '15 stopni', '20 stopni'],
           correctAnswer: 1,
-          explanation: 'Maksymalny kąt nachylenia to około 10 stopni.'
+          explanation: 'Maksymalny bezpieczny kąt nachylenia terenu to około 10 stopni, aby uniknąć przechylenia wózka.'
+        }
+      ]},
+    ]
+  },
+  {
+    id: 'c1m2',
+    courseId: 'c1',
+    title: 'Moduł 2: Eksploatacja i Dokumentacja',
+    lessons: [
+      { id: 'c1l4', title: 'Czynności przed rozpoczęciem pracy', duration: '12:00', isCompleted: false, isLocked: false, type: 'video' },
+      { id: 'c1l5', title: 'Bezpieczeństwo wymiany butli LPG', duration: '25:00', isCompleted: false, isLocked: false, type: 'video' },
+      { id: 'c1l6b', title: 'Dokumentacja techniczna wózka', duration: '5:00', isCompleted: false, isLocked: false, type: 'text' },
+      { id: 'c1l6', title: 'Diagram udźwigu - czytanie wykresów', duration: '30:00', isCompleted: false, isLocked: false, type: 'video' },
+      { id: 'c1l2test', title: 'Test wiedzy - Moduł 2', duration: '10 pytań', isCompleted: false, isLocked: false, type: 'test', questions: [
+        {
+          id: 'q2_1',
+          question: 'Jak często należy wykonywać przegląd przed rozpoczęciem pracy?',
+          type: 'single',
+          options: ['Raz w tygodniu', 'Przed każdą zmianą roboczą', 'Raz w miesiącu', 'Tylko gdy pojawi się usterka'],
+          correctAnswer: 1,
+          explanation: 'Przegląd przedstartowy należy wykonywać przed każdą zmianą roboczą, aby zapewnić bezpieczną eksploatację.'
+        },
+        {
+          id: 'q2_2',
+          question: 'Wybierz wszystkie elementy, które należy sprawdzić przed wymianą butli LPG:',
+          type: 'multiple',
+          options: ['Szczelność instalacji', 'Kolor butli', 'Stan zaworów', 'Datę ważności butli', 'Markę butli'],
+          correctAnswer: [0, 2, 3],
+          explanation: 'Należy sprawdzić szczelność instalacji, stan zaworów i datę ważności butli. Kolor i marka nie są kluczowe dla bezpieczeństwa.'
+        },
+        {
+          id: 'q2_3',
+          question: 'Opisz, co oznaczają poszczególne linie na wykresie diagramu udźwigu:',
+          type: 'open',
+          explanation: 'Diagram udźwigu przedstawia maksymalne obciążenie w zależności od wysokości podnoszenia i odległości środka ciężkości ładunku. Linie pokazują granice bezpiecznego udźwigu.'
         }
       ]},
     ]
@@ -227,48 +252,71 @@ export const COURSE_CURRICULUM: Module[] = [
   {
     id: 'c1m3',
     courseId: 'c1',
-    title: 'Moduł 3: Dozór Techniczny (UDT)',
+    title: 'Moduł 3: Dozór Techniczny i Egzamin',
     lessons: [
-      { id: 'c1l8', title: 'Przepisy prawne', duration: '20:00', isCompleted: false, isLocked: false, type: 'video' },
+      { id: 'c1l8', title: 'Przepisy prawne i obowiązki pracodawcy', duration: '20:00', isCompleted: false, isLocked: false, type: 'video' },
+      { id: 'c1l8a', title: 'Wymagania formalne i prawne UDT', duration: '10:00', isCompleted: false, isLocked: false, type: 'text' },
       { id: 'c1l9', title: 'Dokumentacja techniczno-ruchowa', duration: '15:00', isCompleted: false, isLocked: false, type: 'video' },
-      { id: 'c1l10', title: 'Egzamin końcowy', duration: '20 pytań', isCompleted: false, isLocked: false, type: 'quiz', questions: [
+      { id: 'c1l10', title: 'Egzamin końcowy', duration: '12 pytań', isCompleted: false, isLocked: false, type: 'test', questions: [
         {
           id: 'eq1',
-          question: 'Które przepisy prawne regulują obsługę wózków widłowych?',
+          question: 'Które przepisy prawne regulują obsługę wózków widłowych w Polsce?',
           type: 'multiple',
-          options: ['Kodeks pracy', 'Przepisy BHP', 'Rozporządzenie ministra', 'Ustawa o ochronie konkurencji'],
-          correctAnswer: [0, 1, 2],
-          explanation: 'Obsługę wózków widłowych regulują Kodeks pracy, przepisy BHP i rozporządzenia ministra.'
+          options: ['Kodeks pracy', 'Przepisy BHP', 'Rozporządzenie Ministra Gospodarki', 'Ustawa o ochronie konkurencji', 'Norma PN-EN 16307-1'],
+          correctAnswer: [0, 1, 2, 4],
+          explanation: 'Obsługę wózków widłowych regulują Kodeks pracy, przepisy BHP, rozporządzenie Ministra Gospodarki oraz norma PN-EN 16307-1. Ustawa o ochronie konkurencji nie dotyczy tej kwestii.'
         },
         {
           id: 'eq2',
           question: 'Co zawiera dokumentacja techniczno-ruchowa wózka widłowego?',
           type: 'single',
-          options: ['Tylko mapę tras', 'Dane techniczne, historię remontów i przeglądy', 'Tylko aktualne przeglądy UDT', 'Numer seryjny i kolor'],
+          options: ['Tylko mapę tras jazdy', 'Dane techniczne, historię remontów i przeglądy', 'Tylko aktualne przeglądy UDT', 'Numer seryjny i kolor'],
           correctAnswer: 1,
-          explanation: 'Dokumentacja techniczno-ruchowa zawiera dane techniczne, historię remontów i przeglądy.'
+          explanation: 'Dokumentacja techniczno-ruchowa zawiera pełne dane techniczne, historię przeprowadzonych remontów i wszystkie wykonane przeglądy.'
         },
         {
           id: 'eq3',
-          question: 'Opisz rol inspektora UDT przy zatwierdzaniu wózka do pracy:',
+          question: 'Opisz rolę inspektora UDT przy zatwierdzaniu wózka do pracy:',
           type: 'open',
-          explanation: 'Inspektor UDT sprawdza stan techniczny, bezpieczeństwo i zgodność z normami. Wydaje zaświadczenie o przygodności.'
+          explanation: 'Inspektor UDT sprawdza stan techniczny wózka, weryfikuje bezpieczeństwo eksploatacji i zgodność z obowiązującymi normami. Po pozytywnym wyniku kontroli wydaje zaświadczenie o przydatności do użytkowania.'
         },
         {
           id: 'eq4',
-          question: 'Jaki jest okres ważności przeglądu UDT dla wózków widłowych?',
+          question: 'Jaki jest okres ważności przeglądu UDT dla wózków widłowych objętych dozorem?',
           type: 'single',
           options: ['6 miesięcy', '1 rok', '2 lata', '3 lata'],
-          correctAnswer: 2,
-          explanation: 'Przegląd UDT dla wózków widłowych jest ważny 2 lata.'
+          correctAnswer: 1,
+          explanation: 'Przegląd UDT dla wózków widłowych objętych dozorem technicznym należy przeprowadzać co 12 miesięcy.'
         },
         {
           id: 'eq5',
-          question: 'Wybierz wszystkie dokumenty, które powinny towarzyszyć wózkowi widłowemu:',
+          question: 'Wybierz wszystkie dokumenty, które powinny towarzyszyć wózkowi widłowemu objętemu dozorem:',
           type: 'multiple',
-          options: ['Dowód rejestracyjny', 'Kartę przeglądu okresowego', 'Zaświadczenie UDT', 'Kartę paliwa', 'Umowę leasingu'],
-          correctAnswer: [1, 2],
-          explanation: 'Wózkowi powinny towarzyszyć karta przeglądu okresowego i zaświadczenie UDT.'
+          options: ['Dowód rejestracyjny pojazdu', 'Karta przeglądu okresowego', 'Zaświadczenie UDT o dopuszczeniu do eksploatacji', 'Karta tankowania paliwa', 'Książka rewizyjna UDT'],
+          correctAnswer: [1, 2, 4],
+          explanation: 'Wózkowi objętemu dozorem powinny towarzyszyć: karta przeglądu okresowego, zaświadczenie UDT i książka rewizyjna. Dowód rejestracyjny dotyczy pojazdów drogowych, a karta tankowania nie jest dokumentem obowiązkowym.'
+        },
+        {
+          id: 'eq6',
+          question: 'Od jakiego wieku można uzyskać uprawnienia do obsługi wózków widłowych?',
+          type: 'single',
+          options: ['16 lat', '18 lat', '21 lat', '25 lat'],
+          correctAnswer: 1,
+          explanation: 'Minimalna wymagana wiek do uzyskania uprawnień to 18 lat (dla niektórych kategorii wózków może być wymagane 21 lat).'
+        },
+        {
+          id: 'eq7',
+          question: 'Jakie badania musi przejść kandydat na operatora wózka widłowego?',
+          type: 'multiple',
+          options: ['Badania lekarskie', 'Badania psychologiczne', 'Badania techniczne', 'Badania chemiczne', 'Test wiedzy teoretycznej'],
+          correctAnswer: [0, 1, 4],
+          explanation: 'Kandydat musi przejść badania lekarskie, psychologiczne oraz test wiedzy teoretycznej. Badania techniczne i chemiczne nie są wymagane.'
+        },
+        {
+          id: 'eq8',
+          question: 'Wyjaśnij, co to jest tabela znamionowa wózka widłowego i jakie informacje zawiera:',
+          type: 'open',
+          explanation: 'Tabela znamionowa to trwale przymocowana tabliczka zawierająca kluczowe dane: nazwę producenta, typ, numer seryjny, rok produkcji, udźwig nominalny (Q), odległość środka ciężkości ładunku (c), maksymalną wysokość podnoszenia i masę własną wózka. Jest to podstawowy dokument identyfikacyjny.'
         }
       ]},
     ]

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ViewState, Course, Machine, Language, SEOMetadata } from './types';
 import { Layout } from './components/Layout';
+import LessonTextEditor from './components/LessonTextEditor';
 import { COURSES, MACHINES, MY_COURSES, COURSE_CURRICULUM, ADMIN_STUDENTS, POPULARITY_DATA, TRANSLATIONS, SEO_DATA } from './constants';
 import { 
   ChevronRight, 
@@ -39,7 +40,8 @@ import {
   Trash2,
   Edit,
   Eye,
-  User
+  User,
+  HelpCircle
 } from 'lucide-react';
 
 const App = () => {
@@ -54,12 +56,11 @@ const App = () => {
   const [viewingStudentId, setViewingStudentId] = useState<string | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [adminActiveTab, setAdminActiveTab] = useState<'dashboard' | 'courses' | 'students'>('dashboard');
+  const [adminViewingCourseId, setAdminViewingCourseId] = useState<string | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<{ [key: string]: number | number[] | string }>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
   const [openAccordionIndex, setOpenAccordionIndex] = useState<number | null>(null);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
-  const [showLessonModal, setShowLessonModal] = useState(false);
-  const [showModuleModal, setShowModuleModal] = useState(false);
 
   // --- SEO LOGIC ---
   const [currentSEO, setCurrentSEO] = useState<SEOMetadata | null>(null);
@@ -1474,8 +1475,8 @@ const App = () => {
                </div>
             </div>
 
-            {/* Video Player Container or Quiz */}
-            {currentLesson?.type !== 'quiz' ? (
+            {/* Lesson Content - Video, Text, or Test */}
+            {currentLesson?.type === 'video' && (
             <div className="w-full aspect-video bg-black rounded-sm shadow-xl overflow-hidden relative group">
               {/* Fake Video Interface */}
               <div className="absolute inset-0 flex items-center justify-center">
@@ -1493,7 +1494,166 @@ const App = () => {
                  alt="Lesson Cover"
               />
             </div>
-            ) : (
+            )}
+
+            {currentLesson?.type === 'text' && (
+            <div className="w-full bg-white rounded-sm shadow-sm border border-slate-200 p-8">
+              <div className="prose max-w-none text-base text-slate-700 leading-relaxed">
+                <h2 className="text-2xl font-heading font-bold text-brand-dark mb-6">{currentLesson?.title}</h2>
+                
+                {currentLesson.id === 'c1l6a' && (
+                  <>
+                    <p className="text-lg mb-4">
+                      Przepisy BHP (Bezpieczeństwa i Higieny Pracy) oraz normy bezpieczeństwa stanowią fundament bezpiecznej pracy na wózkach widłowych.
+                    </p>
+                    
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Podstawowe zasady BHP</h3>
+                    <ul className="list-disc pl-6 space-y-2 mb-6">
+                      <li>Operator musi posiadać aktualne uprawnienia do obsługi wózka widłowego kategorii I, II lub III</li>
+                      <li>Przed rozpoczęciem pracy należy przeprowadzić przegląd techniczny wózka</li>
+                      <li>Zabrania się jazdy z uniesionymi widłami bez ładunku</li>
+                      <li>Maksymalna prędkość jazdy w pomieszczeniach: 10 km/h</li>
+                      <li>Operator musi używać środków ochrony indywidualnej (kask, obuwie, kamizelka)</li>
+                    </ul>
+
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Normy europejskie i polskie</h3>
+                    <p className="mb-4">
+                      Obsługa wózków widłowych w Polsce regulowana jest przez:
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2 mb-6">
+                      <li><strong>Rozporządzenie Ministra Gospodarki</strong> w sprawie warunków technicznych dozoru technicznego w zakresie eksploatacji niektórych urządzeń transportu bliskiego</li>
+                      <li><strong>Norma PN-EN 16307-1</strong> - wózki jezdniowe - wymagania bezpieczeństwa i weryfikacja</li>
+                      <li><strong>Ustawa o Transporcie Drogowym</strong> - w zakresie transportu wewnątrzzakładowego</li>
+                      <li><strong>Kodeks Pracy</strong> - obowiązki pracodawcy i pracownika w zakresie BHP</li>
+                    </ul>
+
+                    <div className="bg-brand-accent/10 border-l-4 border-brand-accent p-4 my-6">
+                      <p className="font-bold text-brand-dark mb-2">⚠️ Ważne!</p>
+                      <p>Niestosowanie się do przepisów BHP może skutkować odpowiedzialnością karną lub cywilną, a także utratą uprawnień do obsługi wózków widłowych.</p>
+                    </div>
+                  </>
+                )}
+
+                {currentLesson.id === 'c1l6b' && (
+                  <>
+                    <p className="text-lg mb-4">
+                      Dokumentacja techniczna wózka widłowego zawiera wszystkie informacje niezbędne do jego bezpiecznej i prawidłowej eksploatacji.
+                    </p>
+                    
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Podstawowe dokumenty</h3>
+                    <ul className="list-disc pl-6 space-y-2 mb-6">
+                      <li><strong>Instrukcja obsługi</strong> - zawiera szczegółowy opis obsługi, konserwacji i napraw</li>
+                      <li><strong>Karta charakterystyki</strong> - parametry techniczne, udźwig, wysokość podnoszenia</li>
+                      <li><strong>Deklaracja zgodności CE</strong> - potwierdzenie zgodności z normami UE</li>
+                      <li><strong>Książka UDT</strong> - dziennik przeglądów technicznych i napraw</li>
+                      <li><strong>Certyfikat dopuszczenia</strong> - wydawany przez UDT dla wózków objętych dozorem</li>
+                    </ul>
+
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Tabela znamionowa</h3>
+                    <p className="mb-4">
+                      Na każdym wózku widłowym musi znajdować się trwale przymocowana tabela znamionowa zawierająca:
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2 mb-6">
+                      <li>Nazwa producenta i typ wózka</li>
+                      <li>Numer seryjny i rok produkcji</li>
+                      <li>Udźwig nominalny (Q) - maksymalny ładunek</li>
+                      <li>Odległość środka ciężkości ładunku (c)</li>
+                      <li>Maksymalna wysokość podnoszenia</li>
+                      <li>Masa własna wózka</li>
+                    </ul>
+
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 my-6">
+                      <p className="font-bold text-brand-dark mb-2">💡 Wskazówka</p>
+                      <p>Przed każdą zmianą zapoznaj się z tablicą obciążeń wózka - przekroczenie udźwigu może prowadzić do przewrócenia się wózka!</p>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Przechowywanie dokumentacji</h3>
+                    <p className="mb-4">
+                      Dokumentacja techniczna powinna być przechowywana w miejscu łatwo dostępnym dla operatora i pracowników działu BHP. Zaleca się posiadanie kopii cyfrowych wszystkich dokumentów.
+                    </p>
+                  </>
+                )}
+
+                {currentLesson.id === 'c1l8a' && (
+                  <>
+                    <p className="text-lg mb-4">
+                      Urząd Dozoru Technicznego (UDT) jest organem nadzorującym bezpieczeństwo eksploatacji urządzeń technicznych, w tym niektórych typów wózków widłowych.
+                    </p>
+                    
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Które wózki podlegają dozorowi UDT?</h3>
+                    <p className="mb-4">
+                      Dozorowi technicznemu podlegają wózki jezdniowe podnośnikowe z wysięgnikiem (WJO) oraz wózki z mechanizmem podnoszenia masztu przekraczającym:
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2 mb-6">
+                      <li>Wózki z wysięgnikiem (reach truck) - <strong>wszystkie</strong></li>
+                      <li>Wózki widłowe z masztem powyżej <strong>1,8 metra</strong> wysokości podnoszenia</li>
+                      <li>Wózki z kabiną operatora podnoszoną razem z ładunkiem</li>
+                    </ul>
+
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Obowiązkowe badania i przeglądy</h3>
+                    <div className="bg-slate-50 border border-slate-200 rounded p-4 mb-6">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-slate-300">
+                            <th className="text-left py-2 px-2 font-bold">Rodzaj przeglądu</th>
+                            <th className="text-left py-2 px-2 font-bold">Częstotliwość</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-slate-200">
+                            <td className="py-2 px-2">Badanie UDT przed dopuszczeniem do eksploatacji</td>
+                            <td className="py-2 px-2">Jednorazowo</td>
+                          </tr>
+                          <tr className="border-b border-slate-200">
+                            <td className="py-2 px-2">Okresowe badanie UDT</td>
+                            <td className="py-2 px-2">Co 12 miesięcy</td>
+                          </tr>
+                          <tr className="border-b border-slate-200">
+                            <td className="py-2 px-2">Przegląd konserwacyjny</td>
+                            <td className="py-2 px-2">Co 250 motogodzin</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2 px-2">Przegląd codzienny przez operatora</td>
+                            <td className="py-2 px-2">Przed każdą zmianą</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Uprawnienia operatora</h3>
+                    <p className="mb-4">
+                      Operator wózka widłowego musi posiadać:
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2 mb-6">
+                      <li><strong>Zaświadczenie kwalifikacyjne UDT</strong> - dla wózków objętych dozorem (kategoria II i III)</li>
+                      <li><strong>Świadectwo kwalifikacji</strong> - dla wózków nieobjętych dozorem (kategoria I)</li>
+                      <li>Minimum 18 lat (21 lat dla niektórych kategorii)</li>
+                      <li>Ważne badania lekarskie (kategoria 1 lub 2)</li>
+                      <li>Ważne badania psychologiczne</li>
+                    </ul>
+
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 my-6">
+                      <p className="font-bold text-brand-dark mb-2">⛔ Uwaga!</p>
+                      <p>Obsługa wózka widłowego bez wymaganych uprawnień jest wykroczeniem zagrożonym karą grzywny do 5000 zł. Pracodawca dopuszczający do pracy osobę bez uprawnień może zostać ukarany grzywną do 30 000 zł.</p>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-brand-dark mt-6 mb-3">Dokumentacja eksploatacyjna</h3>
+                    <p className="mb-4">
+                      Dla każdego wózka objętego dozorem UDT prowadzi się Książkę Rewizyjną, w której odnotowywane są:
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2">
+                      <li>Wyniki badań okresowych UDT</li>
+                      <li>Przeprowadzone naprawy główne i wymiany elementów nośnych</li>
+                      <li>Wypadki i awarie związane z eksploatacją</li>
+                      <li>Zmiany właściciela lub miejsca eksploatacji</li>
+                    </ul>
+                  </>
+                )}
+              </div>
+            </div>
+            )}
+
+            {currentLesson?.type === 'test' && (
             <div className="w-full bg-white rounded-sm shadow-sm border border-slate-200 p-6">
               <h2 className="text-2xl font-heading font-bold text-brand-dark mb-6">{currentLesson?.title}</h2>
               <div className="space-y-6">
@@ -1518,7 +1678,7 @@ const App = () => {
                               value={idx}
                               checked={quizAnswers[question.id] === idx}
                               onChange={(e) => setQuizAnswers({...quizAnswers, [question.id]: parseInt(e.target.value)})}
-                              className="w-4 h-4"
+                              className="w-4 h-4 rounded-full border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                             />
                             <span className="text-slate-700">{option}</span>
                           </label>
@@ -1541,7 +1701,7 @@ const App = () => {
                                   setQuizAnswers({...quizAnswers, [question.id]: current.filter(i => i !== idx)});
                                 }
                               }}
-                              className="w-4 h-4"
+                              className="w-4 h-4 rounded-sm border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                             />
                             <span className="text-slate-700">{option}</span>
                           </label>
@@ -1554,7 +1714,7 @@ const App = () => {
                         value={(quizAnswers[question.id] as string) || ''}
                         onChange={(e) => setQuizAnswers({...quizAnswers, [question.id]: e.target.value})}
                         placeholder="Wpisz swoją odpowiedź tutaj..."
-                        className="w-full p-4 border border-slate-300 rounded focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+                        className="w-full p-4 border border-slate-300 rounded focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                         rows={4}
                       />
                     )}
@@ -1573,13 +1733,13 @@ const App = () => {
                 onClick={() => setShowQuizResults(!showQuizResults)}
                 className="mt-6 px-6 py-3 bg-brand-primary text-white font-bold rounded hover:bg-brand-dark transition-colors"
               >
-                {showQuizResults ? 'Ukryj wyjaśnienia' : 'Przesyłaj odpowiedzi i zobacz wyjaśnienia'}
+                {showQuizResults ? 'Ukryj wyjaśnienia' : 'Prześlij odpowiedzi i zobacz wyjaśnienia'}
               </button>
             </div>
             )}
 
-            {/* Content Tabs & Materials */}
-            {currentLesson?.type !== 'quiz' && (
+            {/* Content Tabs & Materials - Only for video lessons */}
+            {currentLesson?.type === 'video' && (
             <div className="bg-white rounded-sm shadow-sm border border-slate-200 p-6">
               <div className="flex border-b border-slate-200 mb-6">
                  <button className="px-6 py-3 text-sm font-bold text-brand-accent border-b-2 border-brand-accent">Opis Lekcji</button>
@@ -1700,7 +1860,11 @@ const App = () => {
                                   ) : lesson.isLocked ? (
                                      <Lock size={16} className="text-slate-400" />
                                   ) : (
-                                     <PlayCircle size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />
+                                     <>
+                                       {lesson.type === 'video' && <PlayCircle size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />}
+                                       {lesson.type === 'text' && <BookOpen size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />}
+                                       {lesson.type === 'test' && <HelpCircle size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />}
+                                     </>
                                   )}
                                </div>
                                <div className="flex-1">
@@ -1708,8 +1872,15 @@ const App = () => {
                                      {lesson.title}
                                   </div>
                                   <div className={`text-xs flex items-center gap-2 ${lesson.isCompleted ? 'text-green-600' : 'text-slate-400'}`}>
-                                     {lesson.type === 'video' ? <MonitorPlay size={10}/> : <CheckCircle size={10}/>}
+                                     <Clock size={10}/>
                                      {lesson.duration}
+                                     {lesson.type === 'test' && (
+                                       <>
+                                         <span className="mx-1">•</span>
+                                         <HelpCircle size={10}/>
+                                         {lesson.questions?.length || 0} pytań
+                                       </>
+                                     )}
                                   </div>
                                </div>
                              </div>
@@ -1730,7 +1901,7 @@ const App = () => {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'students'>(adminActiveTab);
     const [isAddingCourse, setIsAddingCourse] = useState(false);
     const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
-    const [viewingCourseId, setViewingCourseId] = useState<string | null>(null);
+    // viewingCourseId przeniesiony do globalnego stanu jako adminViewingCourseId
     const [categoryFilter, setCategoryFilter] = useState<string>('Wszystkie');
     const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
     const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
@@ -1761,7 +1932,7 @@ const App = () => {
           });
           setEditingCourseId(returnToCourseId);
           setIsAddingCourse(true);
-          setViewingCourseId(null);
+          setAdminViewingCourseId(null);
           setActiveTab('courses');
         }
         // Wyczyść localStorage
@@ -1822,7 +1993,7 @@ const App = () => {
       });
       setEditingCourseId(course.id);
       setIsAddingCourse(true);
-      setViewingCourseId(null);
+      setAdminViewingCourseId(null);
     };
 
     const handleDeleteCourse = (courseId: string) => {
@@ -1976,8 +2147,9 @@ const App = () => {
                     <div 
                       key={course.id} 
                       onClick={() => {
-                        setActiveTab('courses');
-                        setViewingCourseId(course.id);
+                        const courseId = course.id;
+                        setAdminViewingCourseId(courseId);
+                        setAdminActiveTab('courses');
                       }}
                       className="flex items-stretch justify-between bg-slate-50 rounded-sm hover:bg-slate-100 transition-colors cursor-pointer overflow-hidden"
                     >
@@ -2018,11 +2190,11 @@ const App = () => {
           {/* Courses Management Tab */}
           {activeTab === 'courses' && (
             <div>
-              {viewingCourseId ? (
+              {adminViewingCourseId ? (
                 // Course Details View
                 <div>
                   {(() => {
-                    const course = COURSES.find(c => c.id === viewingCourseId);
+                    const course = COURSES.find(c => c.id === adminViewingCourseId);
                     if (!course) return null;
                     
                     const enrolledStudents = ADMIN_STUDENTS.filter(s => s.course === course.id);
@@ -2030,7 +2202,7 @@ const App = () => {
                     return (
                       <div>
                         <button
-                          onClick={() => setViewingCourseId(null)}
+                          onClick={() => setAdminViewingCourseId(null)}
                           className="mb-6 flex items-center gap-2 text-slate-600 hover:text-brand-accent transition-colors font-bold"
                         >
                           <ChevronRight size={16} className="rotate-180" /> Wróć do listy
@@ -2220,7 +2392,7 @@ const App = () => {
                             </div>
                             <div className="flex gap-2">
                               <button
-                                onClick={() => setViewingCourseId(course.id)}
+                                onClick={() => setAdminViewingCourseId(course.id)}
                                 className="flex-1 px-3 py-2 text-brand-primary hover:bg-brand-primary/10 rounded transition-colors flex items-center justify-center gap-2 font-bold text-sm"
                                 title="Podgląd"
                               >
@@ -2361,7 +2533,7 @@ const App = () => {
                         id="isPopular"
                         checked={courseForm.isPopular}
                         onChange={(e) => setCourseForm({ ...courseForm, isPopular: e.target.checked })}
-                        className="w-4 h-4 text-brand-accent border-slate-300 rounded focus:ring-brand-accent"
+                        className="w-4 h-4 rounded-sm border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                       />
                       <label htmlFor="isPopular" className="text-sm font-bold text-slate-700">
                         Oznacz jako popularne
@@ -2397,24 +2569,24 @@ const App = () => {
                         <h4 className="text-lg font-heading font-bold text-brand-dark mb-6">Struktura Szkolenia</h4>
                         
                         {isAddingModule ? (
-                          // Module Add Form
-                          <div className="bg-slate-50 p-6 rounded-sm border border-slate-200 mb-6">
-                            <div className="flex justify-between items-center mb-4">
-                              <h5 className="text-base font-bold text-brand-dark">
-                                Dodaj Nowy Moduł
-                              </h5>
-                              <button
-                                onClick={() => {
-                                  setIsAddingModule(false);
-                                  setModuleForm({ title: '', description: '' });
-                                }}
-                                className="text-slate-400 hover:text-slate-600"
-                              >
-                                <X size={20} />
-                              </button>
-                            </div>
+                          // Module Add Form - Modal
+                          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+                            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                              <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex justify-between items-center">
+                                <h3 className="text-2xl font-heading font-bold text-brand-dark">Dodaj Nowy Moduł</h3>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsAddingModule(false);
+                                    setModuleForm({ title: '', description: '' });
+                                  }}
+                                  className="text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                  <X size={24} />
+                                </button>
+                              </div>
 
-                            <div className="space-y-4">
+                              <div className="p-6 space-y-4">
                               <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Tytuł modułu</label>
                                 <input
@@ -2454,27 +2626,28 @@ const App = () => {
                                 </button>
                               </div>
                             </div>
+                            </div>
                           </div>
                         ) : isEditingModule ? (
-                          // Module Edit Form
-                          <div className="bg-slate-50 p-6 rounded-sm border border-slate-200 mb-6">
-                            <div className="flex justify-between items-center mb-4">
-                              <h5 className="text-base font-bold text-brand-dark">
-                                Edytuj Moduł
-                              </h5>
-                              <button
-                                onClick={() => {
-                                  setIsEditingModule(false);
-                                  setEditingModuleId(null);
-                                  setModuleForm({ title: '', description: '' });
-                                }}
-                                className="text-slate-400 hover:text-slate-600"
-                              >
-                                <X size={20} />
-                              </button>
-                            </div>
+                          // Module Edit Form - Modal
+                          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+                            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                              <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex justify-between items-center">
+                                <h3 className="text-2xl font-heading font-bold text-brand-dark">Edytuj Moduł</h3>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsEditingModule(false);
+                                    setEditingModuleId(null);
+                                    setModuleForm({ title: '', description: '' });
+                                  }}
+                                  className="text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                  <X size={24} />
+                                </button>
+                              </div>
 
-                            <div className="space-y-4">
+                              <div className="p-6 space-y-4">
                               <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Tytuł modułu</label>
                                 <input
@@ -2514,27 +2687,28 @@ const App = () => {
                                 </button>
                               </div>
                             </div>
+                            </div>
                           </div>
                         ) : isAddingLesson ? (
-                          // Lesson Add Form
-                          <div className="bg-slate-50 p-6 rounded-sm border border-slate-200 mb-6">
-                            <div className="flex justify-between items-center mb-4">
-                              <h5 className="text-base font-bold text-brand-dark">
-                                Dodaj Nową Lekcję
-                              </h5>
-                              <button
-                                onClick={() => {
-                                  setIsAddingLesson(false);
-                                  setEditingModuleId(null);
-                                  setLessonForm({ title: '', duration: '', type: 'video', videoUrl: '', description: '', materials: [], questions: [] });
-                                }}
-                                className="text-slate-400 hover:text-slate-600"
-                              >
-                                <X size={20} />
-                              </button>
-                            </div>
+                          // Lesson Add Form - Modal
+                          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+                            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                              <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex justify-between items-center">
+                                <h3 className="text-2xl font-heading font-bold text-brand-dark">Dodaj Nową Lekcję</h3>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsAddingLesson(false);
+                                    setEditingModuleId(null);
+                                    setLessonForm({ title: '', duration: '', type: 'video', videoUrl: '', description: '', materials: [], questions: [] });
+                                  }}
+                                  className="text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                  <X size={24} />
+                                </button>
+                              </div>
 
-                            <div className="space-y-4">
+                              <div className="p-6 space-y-4">
                               <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Tytuł lekcji</label>
                                 <input
@@ -2587,13 +2761,20 @@ const App = () => {
 
                               <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Opis lekcji</label>
-                                <textarea
-                                  value={lessonForm.description}
-                                  onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
-                                  className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent"
-                                  rows={4}
-                                  placeholder="Szczegółowy opis zawartości lekcji..."
-                                />
+                                {lessonForm.type === 'text' ? (
+                                  <LessonTextEditor
+                                    content={lessonForm.description}
+                                    onChange={(content) => setLessonForm({ ...lessonForm, description: content })}
+                                  />
+                                ) : (
+                                  <textarea
+                                    value={lessonForm.description}
+                                    onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
+                                    className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent"
+                                    rows={4}
+                                    placeholder="Szczegółowy opis zawartości lekcji..."
+                                  />
+                                )}
                               </div>
 
                               <div>
@@ -2722,7 +2903,7 @@ const App = () => {
                                                           newQuestions[qIdx].correctAnswer = optIdx;
                                                           setLessonForm({ ...lessonForm, questions: newQuestions });
                                                         }}
-                                                        className="w-4 h-4"
+                                                        className="w-4 h-4 rounded-full border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                                                       />
                                                     ) : (
                                                       <input
@@ -2741,7 +2922,7 @@ const App = () => {
                                                           newQuestions[qIdx].correctAnswer = currentAnswers;
                                                           setLessonForm({ ...lessonForm, questions: newQuestions });
                                                         }}
-                                                        className="w-4 h-4"
+                                                        className="w-4 h-4 rounded-sm border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                                                       />
                                                     )}
                                                     <input
@@ -2894,26 +3075,27 @@ const App = () => {
                                 </button>
                               </div>
                             </div>
+                            </div>
                           </div>
                         ) : editingLessonId ? (
-                          // Lesson Edit Form
-                          <div className="bg-slate-50 p-6 rounded-sm border border-slate-200">
-                            <div className="flex justify-between items-center mb-4">
-                              <h5 className="text-base font-bold text-brand-dark">
-                                Edytuj Lekcję
-                              </h5>
-                              <button
-                                onClick={() => {
-                                  setEditingLessonId(null);
-                                  setLessonForm({ title: '', duration: '', type: 'video', videoUrl: '', description: '', materials: [], questions: [] });
-                                }}
-                                className="text-slate-400 hover:text-slate-600"
-                              >
-                                <X size={20} />
-                              </button>
-                            </div>
+                          // Lesson Edit Form - Modal
+                          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+                            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                              <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex justify-between items-center">
+                                <h3 className="text-2xl font-heading font-bold text-brand-dark">Edytuj Lekcję</h3>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingLessonId(null);
+                                    setLessonForm({ title: '', duration: '', type: 'video', videoUrl: '', description: '', materials: [], questions: [] });
+                                  }}
+                                  className="text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                  <X size={24} />
+                                </button>
+                              </div>
 
-                            <div className="space-y-4">
+                              <div className="p-6 space-y-4">
                               <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Tytuł lekcji</label>
                                 <input
@@ -2966,13 +3148,20 @@ const App = () => {
 
                               <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Opis lekcji</label>
-                                <textarea
-                                  value={lessonForm.description}
-                                  onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
-                                  className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent"
-                                  rows={4}
-                                  placeholder="Szczegółowy opis zawartości lekcji..."
-                                />
+                                {lessonForm.type === 'text' ? (
+                                  <LessonTextEditor
+                                    content={lessonForm.description}
+                                    onChange={(content) => setLessonForm({ ...lessonForm, description: content })}
+                                  />
+                                ) : (
+                                  <textarea
+                                    value={lessonForm.description}
+                                    onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
+                                    className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent"
+                                    rows={4}
+                                    placeholder="Szczegółowy opis zawartości lekcji..."
+                                  />
+                                )}
                               </div>
 
                               <div>
@@ -3101,7 +3290,7 @@ const App = () => {
                                                           newQuestions[qIdx].correctAnswer = optIdx;
                                                           setLessonForm({ ...lessonForm, questions: newQuestions });
                                                         }}
-                                                        className="w-4 h-4"
+                                                        className="w-4 h-4 rounded-full border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                                                       />
                                                     ) : (
                                                       <input
@@ -3120,7 +3309,7 @@ const App = () => {
                                                           newQuestions[qIdx].correctAnswer = currentAnswers;
                                                           setLessonForm({ ...lessonForm, questions: newQuestions });
                                                         }}
-                                                        className="w-4 h-4"
+                                                        className="w-4 h-4 rounded-sm border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                                                       />
                                                     )}
                                                     <input
@@ -3265,6 +3454,7 @@ const App = () => {
                                   Anuluj
                                 </button>
                               </div>
+                            </div>
                             </div>
                           </div>
                         ) : (
@@ -4161,7 +4351,7 @@ const App = () => {
                             name="editMode" 
                             checked={accessEditMode === 'add'}
                             onChange={() => setAccessEditMode('add')}
-                            className="w-4 h-4 text-brand-primary"
+                            className="w-4 h-4 rounded-full border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                           />
                           <div>
                             <div className="font-bold text-slate-800">Dodaj dni</div>
@@ -4176,7 +4366,7 @@ const App = () => {
                             name="editMode" 
                             checked={accessEditMode === 'set'}
                             onChange={() => setAccessEditMode('set')}
-                            className="w-4 h-4 text-brand-primary"
+                            className="w-4 h-4 rounded-full border-2 border-brand-accent accent-brand-accent focus:ring-brand-accent"
                           />
                           <div>
                             <div className="font-bold text-slate-800">Ustaw datę końcową</div>
