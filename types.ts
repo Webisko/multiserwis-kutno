@@ -1,5 +1,6 @@
-export type ViewState = 'HOME' | 'CATALOG' | 'COURSE_DETAIL' | 'LMS' | 'LESSON_PLAYER' | 'RENTALS' | 'MACHINE_DETAIL' | 'SERVICES' | 'CONTACT' | 'ADMIN' | 'STUDENT_DETAIL' | 'STUDENTS_LIST';
+export type ViewState = 'HOME' | 'CATALOG' | 'COURSE_DETAIL' | 'LMS' | 'LESSON_PLAYER' | 'RENTALS' | 'MACHINE_DETAIL' | 'SERVICES' | 'CONTACT' | 'ADMIN' | 'STUDENT_DETAIL' | 'STUDENTS_LIST' | 'ADMIN_PANEL' | 'COMPANY_GUARDIAN_PANEL';
 export type Language = 'PL' | 'EN' | 'DE';
+export type UserRole = 'ADMIN' | 'MANAGER' | 'STUDENT' | 'COMPANY_GUARDIAN';
 
 export interface Course {
   id: string;
@@ -84,6 +85,26 @@ export interface Student {
   expirationDays: number;
   status: 'active' | 'warning' | 'expired';
   completedLessons: string[]; // Array of lesson IDs that are completed
+}
+
+export interface StudentUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  company?: string;
+  profileImage?: string;
+}
+
+export interface CompanyGuardianReport {
+  employeeId: string;
+  employeeName: string;
+  courseId: string;
+  courseName: string;
+  progress: number;
+  status: 'active' | 'completed' | 'pending';
+  completedDate?: string;
+  lastActivityDate: string;
 }
 
 export interface SEOMetadata {

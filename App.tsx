@@ -43,6 +43,7 @@ import {
   User,
   HelpCircle
 } from 'lucide-react';
+import { StudentUser, UserRole, CompanyGuardianReport } from './types';
 
 const App = () => {
   const [currentView, setView] = useState<ViewState>('HOME');
@@ -61,6 +62,13 @@ const App = () => {
   const [showQuizResults, setShowQuizResults] = useState(false);
   const [openAccordionIndex, setOpenAccordionIndex] = useState<number | null>(null);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
+
+  // --- SYSTEM ROL UŻYTKOWNIKÓW ---
+  const [currentUser, setCurrentUser] = useState<StudentUser | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
   // --- SEO LOGIC ---
   const [currentSEO, setCurrentSEO] = useState<SEOMetadata | null>(null);
@@ -83,6 +91,58 @@ const App = () => {
   }, [currentView, language]);
 
   const t = TRANSLATIONS[language];
+
+  // --- MOCK USERS DATA (for testing) ---
+  const mockUsers: { [key: string]: { password: string; user: User } } = {
+    'admin@test.com': {
+      password: 'admin123',
+      user: { id: 'u1', email: 'admin@test.com', name: 'Administratortv', role: 'ADMIN' }
+    },
+    'manager@test.com': {
+      password: 'manager123',
+      user: { id: 'u2', email: 'manager@test.com', name: 'Manager Platformy', role: 'MANAGER' }
+    },
+    'student@test.com': {
+      password: 'student123',
+      user: { id: 'u3', email: 'student@test.com', name: 'Jan Kowalski', role: 'STUDENT' }
+    },
+    'guardian@test.com': {
+      password: 'guardian123',
+      user: { id: 'u4', email: 'guardian@test.com', name: 'Opiekun Firmy ABC', role: 'COMPANY_GUARDIAN', company: 'ABC Sp. z o.o.' }
+    }
+  };
+
+  // Funkcja logowania
+  const handleLogin = () => {
+    const user = mockUsers[loginEmail];
+    if (user && user.password === loginPassword) {
+      setCurrentUser(user.user);
+      setIsLoggedIn(true);
+      setShowLoginModal(false);
+      setLoginEmail('');
+      setLoginPassword('');
+      
+      // Routing na podstawie roli
+      if (user.user.role === 'ADMIN') {
+        setView('ADMIN_PANEL');
+      } else if (user.user.role === 'MANAGER') {
+        setView('ADMIN');
+      } else if (user.user.role === 'STUDENT') {
+        setView('LMS');
+      } else if (user.user.role === 'COMPANY_GUARDIAN') {
+        setView('COMPANY_GUARDIAN_PANEL');
+      }
+    } else {
+      alert('Błędny email lub hasło');
+    }
+  };
+
+  // Funkcja wylogowania
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    setView('HOME');
+  };
 
   // Get program details for each course
   const getCourseProgram = (courseId: string) => {
@@ -1924,6 +1984,115 @@ const App = () => {
       </div>
     );
   }
+
+  const AdminPanelView = () => (
+    <div className="min-h-screen bg-slate-50 animate-fade-in">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+        <div className="flex justify-between items-center mb-8 border-b border-slate-200 pb-6">
+          <div>
+            <h2 className="text-3xl font-heading font-bold text-brand-primary mb-2">Panel Administratora</h2>
+            <p className="text-slate-500">Witaj, {currentUser?.name}</p>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white font-bold rounded-sm hover:bg-red-700 transition-colors"
+          >
+            Wyloguj się
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {/* Statystyka: Użytkownicy */}
+          <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Użytkownicy</h3>
+              <Users size={24} className="text-blue-500" />
+            </div>
+            <div className="text-3xl font-bold text-brand-dark mb-1">1,247</div>
+            <p className="text-xs text-slate-500">+12 w tym miesiącu</p>
+          </div>
+
+          {/* Statystyka: Szkolenia */}
+          <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-green-500">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Szkolenia</h3>
+              <GraduationCap size={24} className="text-green-500" />
+            </div>
+            <div className="text-3xl font-bold text-brand-dark mb-1">28</div>
+            <p className="text-xs text-slate-500">8 aktywnych</p>
+          </div>
+
+          {/* Statystyka: Firmy */}
+          <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-purple-500">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Firmy</h3>
+              <Truck size={24} className="text-purple-500" />
+            </div>
+            <div className="text-3xl font-bold text-brand-dark mb-1">34</div>
+            <p className="text-xs text-slate-500">+3 w tym miesiącu</p>
+          </div>
+
+          {/* Statystyka: Przychód */}
+          <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-orange-500">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Przychód</h3>
+              <BarChart3 size={24} className="text-orange-500" />
+            </div>
+            <div className="text-3xl font-bold text-brand-dark mb-1">98,450 zł</div>
+            <p className="text-xs text-slate-500">+15% względem ubiegłego miesiąca</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Ostatnie działania */}
+          <div className="bg-white rounded-sm shadow-sm border border-slate-100">
+            <div className="p-6 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-brand-dark">Ostatnie działania</h3>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {[
+                { action: 'Nowy użytkownik', detail: 'Krzysztof Nowak', time: '2 godziny temu' },
+                { action: 'Nowe szkolenie', detail: 'UDT - Wózki widłowe 2026', time: '5 godzin temu' },
+                { action: 'Zgłoszenie od firmy', detail: 'ABC Sp. z o.o. - 5 pracowników', time: '1 dzień temu' },
+                { action: 'Raport ukończony', detail: 'Kurs BHP - Styczeń 2026', time: '2 dni temu' }
+              ].map((item, idx) => (
+                <div key={idx} className="p-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-bold text-sm text-brand-dark">{item.action}</p>
+                      <p className="text-xs text-slate-500">{item.detail}</p>
+                    </div>
+                    <span className="text-xs text-slate-400">{item.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Zarządzanie systemem */}
+          <div className="bg-white rounded-sm shadow-sm border border-slate-100">
+            <div className="p-6 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-brand-dark">Zarządzanie systemem</h3>
+            </div>
+            <div className="p-6 space-y-3">
+              <button className="w-full px-4 py-3 border border-slate-300 bg-white text-brand-dark font-bold uppercase text-xs rounded-sm hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <Users size={16} /> Zarządzaj użytkownikami
+              </button>
+              <button className="w-full px-4 py-3 border border-slate-300 bg-white text-brand-dark font-bold uppercase text-xs rounded-sm hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <GraduationCap size={16} /> Zarządzaj szkoleniami
+              </button>
+              <button className="w-full px-4 py-3 border border-slate-300 bg-white text-brand-dark font-bold uppercase text-xs rounded-sm hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <Truck size={16} /> Zarządzaj firmami
+              </button>
+              <button className="w-full px-4 py-3 border border-slate-300 bg-white text-brand-dark font-bold uppercase text-xs rounded-sm hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <Settings size={16} /> Ustawienia systemu
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   const AdminView = () => {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'students'>(adminActiveTab);
@@ -4578,20 +4747,263 @@ const App = () => {
     );
   };
 
+  const CompanyGuardianPanelView = () => {
+    // Mock dane pracowników w firmie
+    const companyEmployees: CompanyGuardianReport[] = [
+      {
+        employeeId: 'e1',
+        employeeName: 'Mateusz Kowalski',
+        courseId: 'c1',
+        courseName: 'Operatorzy wózków widłowych - UDT',
+        progress: 85,
+        status: 'active',
+        lastActivityDate: '2026-01-02'
+      },
+      {
+        employeeId: 'e2',
+        employeeName: 'Anna Lewandowska',
+        courseId: 'c2',
+        courseName: 'Ładowarki teleskopowe - SEP',
+        progress: 100,
+        status: 'completed',
+        completedDate: '2025-12-28',
+        lastActivityDate: '2025-12-28'
+      },
+      {
+        employeeId: 'e3',
+        employeeName: 'Paweł Zawisza',
+        courseId: 'c1',
+        courseName: 'Operatorzy wózków widłowych - UDT',
+        progress: 45,
+        status: 'active',
+        lastActivityDate: '2026-01-01'
+      },
+      {
+        employeeId: 'e4',
+        employeeName: 'Katarzyna Wójcik',
+        courseId: 'c3',
+        courseName: 'Szkolenie BHP - Zasady bezpieczeństwa',
+        progress: 10,
+        status: 'active',
+        lastActivityDate: '2025-12-30'
+      }
+    ];
+
+    const getStatusBadge = (status: string, progress: number) => {
+      if (status === 'completed') {
+        return <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold">Ukończone</span>;
+      } else if (progress >= 75) {
+        return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">Blisko końca</span>;
+      } else if (progress >= 50) {
+        return <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold">W trakcie</span>;
+      } else {
+        return <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold">Rozpoczęte</span>;
+      }
+    };
+
+    const completedCount = companyEmployees.filter(e => e.status === 'completed').length;
+    const activeCount = companyEmployees.filter(e => e.status === 'active').length;
+    const avgProgress = Math.round(companyEmployees.reduce((sum, e) => sum + e.progress, 0) / companyEmployees.length);
+
+    return (
+      <div className="min-h-screen bg-slate-50 animate-fade-in">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+          <div className="flex justify-between items-center mb-8 border-b border-slate-200 pb-6">
+            <div>
+              <h2 className="text-3xl font-heading font-bold text-brand-primary mb-2">Panel Opiekuna Firmy</h2>
+              <p className="text-slate-500">Witaj, {currentUser?.name} ({currentUser?.company})</p>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white font-bold rounded-sm hover:bg-red-700 transition-colors"
+            >
+              Wyloguj się
+            </button>
+          </div>
+
+          {/* Statystyki */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-blue-500">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Pracownicy</h3>
+                <Users size={24} className="text-blue-500" />
+              </div>
+              <div className="text-3xl font-bold text-brand-dark mb-1">{companyEmployees.length}</div>
+              <p className="text-xs text-slate-500">Zgłoszeni do szkoleń</p>
+            </div>
+
+            <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-green-500">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Ukończeni</h3>
+                <CheckCircle size={24} className="text-green-500" />
+              </div>
+              <div className="text-3xl font-bold text-brand-dark mb-1">{completedCount}</div>
+              <p className="text-xs text-slate-500">{Math.round(completedCount / companyEmployees.length * 100)}% szkolenia</p>
+            </div>
+
+            <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-orange-500">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">W trakcie</h3>
+                <MonitorPlay size={24} className="text-orange-500" />
+              </div>
+              <div className="text-3xl font-bold text-brand-dark mb-1">{activeCount}</div>
+              <p className="text-xs text-slate-500">Aktywnie uczących się</p>
+            </div>
+
+            <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-purple-500">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Średni postęp</h3>
+                <Trophy size={24} className="text-purple-500" />
+              </div>
+              <div className="text-3xl font-bold text-brand-dark mb-1">{avgProgress}%</div>
+              <p className="text-xs text-slate-500">Wszystkich pracowników</p>
+            </div>
+          </div>
+
+          {/* Raporty pracowników */}
+          <div className="bg-white rounded-sm shadow-sm border border-slate-100">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-brand-dark">Raport postępów pracowników</h3>
+              <button className="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white font-bold text-sm rounded-sm hover:bg-brand-dark transition-colors">
+                <Printer size={16} /> Drukuj raport
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-100">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Pracownik</th>
+                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Szkolenie</th>
+                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Postęp</th>
+                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Ostatnia aktywność</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {companyEmployees.map((employee) => (
+                    <tr key={employee.employeeId} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="font-bold text-brand-dark text-sm">{employee.employeeName}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-slate-600">{employee.courseName}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 bg-slate-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full transition-all ${
+                                employee.progress === 100 ? 'bg-green-500' :
+                                employee.progress >= 75 ? 'bg-blue-500' :
+                                employee.progress >= 50 ? 'bg-yellow-500' :
+                                'bg-orange-500'
+                              }`}
+                              style={{ width: `${employee.progress}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs font-bold text-slate-600 w-10">{employee.progress}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {getStatusBadge(employee.status, employee.progress)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-xs text-slate-500">
+                          {new Date(employee.lastActivityDate).toLocaleDateString('pl-PL')}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <Layout currentView={currentView} setView={setView} language={language} setLanguage={setLanguage} setCatalogCategory={setCatalogCategory}>
-      {currentView === 'HOME' && <HomeView />}
-      {currentView === 'CATALOG' && <CatalogView />}
-      {currentView === 'COURSE_DETAIL' && <CourseDetailView />}
-      {currentView === 'LMS' && <LMSView />}
-      {currentView === 'LESSON_PLAYER' && <LessonPlayerView />}
-      {currentView === 'RENTALS' && <RentalsView />}
-      {currentView === 'MACHINE_DETAIL' && <MachineDetailView />}
-      {currentView === 'SERVICES' && <ServicesView />}
-      {currentView === 'CONTACT' && <ContactView />}
-      {currentView === 'ADMIN' && <AdminView />}
-      {currentView === 'STUDENT_DETAIL' && <StudentDetailView />}
-    </Layout>
+    <>
+      {/* Modal logowania */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-sm shadow-lg p-8 w-full max-w-md">
+            <h2 className="text-2xl font-heading font-bold text-brand-dark mb-6">Zaloguj się</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Email</label>
+                <input 
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="admin@test.com"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-primary"
+                />
+                <p className="text-xs text-slate-500 mt-1">Dostępne konta testowe:</p>
+                <ul className="text-xs text-slate-500 space-y-1 mt-2">
+                  <li>• admin@test.com / admin123</li>
+                  <li>• manager@test.com / manager123</li>
+                  <li>• student@test.com / student123</li>
+                  <li>• guardian@test.com / guardian123</li>
+                </ul>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Hasło</label>
+                <input 
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-primary"
+                />
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button 
+                  onClick={() => setShowLoginModal(false)}
+                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-600 font-bold rounded-sm hover:bg-slate-50 transition-colors"
+                >
+                  Anuluj
+                </button>
+                <button 
+                  onClick={handleLogin}
+                  className="flex-1 px-4 py-2 bg-brand-primary text-white font-bold rounded-sm hover:bg-brand-dark transition-colors"
+                >
+                  Zaloguj
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Layout 
+        currentView={currentView} 
+        setView={setView} 
+        language={language} 
+        setLanguage={setLanguage} 
+        setCatalogCategory={setCatalogCategory}
+        onShowLoginModal={() => setShowLoginModal(true)}
+        isLoggedIn={isLoggedIn}
+        userName={currentUser?.name}
+        onLogout={handleLogout}
+      >
+        {currentView === 'HOME' && <HomeView />}
+        {currentView === 'CATALOG' && <CatalogView />}
+        {currentView === 'COURSE_DETAIL' && <CourseDetailView />}
+        {currentView === 'LMS' && <LMSView />}
+        {currentView === 'LESSON_PLAYER' && <LessonPlayerView />}
+        {currentView === 'RENTALS' && <RentalsView />}
+        {currentView === 'MACHINE_DETAIL' && <MachineDetailView />}
+        {currentView === 'SERVICES' && <ServicesView />}
+        {currentView === 'CONTACT' && <ContactView />}
+        {currentView === 'ADMIN' && <AdminView />}
+        {currentView === 'ADMIN_PANEL' && <AdminPanelView />}
+        {currentView === 'COMPANY_GUARDIAN_PANEL' && <CompanyGuardianPanelView />}
+        {currentView === 'STUDENT_DETAIL' && <StudentDetailView />}
+      </Layout>
+    </>
   );
 };
 

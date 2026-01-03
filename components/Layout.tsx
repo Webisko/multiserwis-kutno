@@ -16,9 +16,13 @@ interface LayoutProps {
   language: Language;
   setLanguage: (lang: Language) => void;
   setCatalogCategory: (category: string) => void;
+  onShowLoginModal?: () => void;
+  isLoggedIn?: boolean;
+  userName?: string;
+  onLogout?: () => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, language, setLanguage, setCatalogCategory }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, language, setLanguage, setCatalogCategory, onShowLoginModal, isLoggedIn, userName, onLogout }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
@@ -172,16 +176,36 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
             <span onClick={() => setView('CONTACT')} className={navItemClass('CONTACT')}>{t.contact}</span>
             <span onClick={() => setView('ADMIN')} className={navItemClass('ADMIN')}>{t.admin}</span>
             
+            {!isLoggedIn ? (
+              <button 
+                onClick={onShowLoginModal}
+                className="px-5 py-2 rounded-sm font-bold text-sm uppercase tracking-wide transition-all bg-brand-accent text-white hover:bg-brand-accentHover shadow-lg"
+              >
+                <User size={16} className="inline mr-2" />
+                Zaloguj
+              </button>
+            ) : (
+              <div className="flex items-center gap-4">
+                <span className="text-white text-sm font-bold">{userName}</span>
+                <button 
+                  onClick={onLogout}
+                  className="px-4 py-2 rounded-sm font-bold text-xs uppercase tracking-wide bg-red-600 text-white hover:bg-red-700 transition-colors"
+                >
+                  Wyloguj
+                </button>
+              </div>
+            )}
+            
             <button 
               onClick={() => setView('LMS')}
               className={`
                 flex items-center gap-2 px-5 py-2 rounded-sm font-bold text-sm uppercase tracking-wide transition-all
                 ${currentView === 'LMS' 
-                  ? 'bg-brand-accent text-white shadow-lg shadow-brand-accent/30' 
+                  ? 'bg-blue-600 text-white shadow-lg' 
                   : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'}
               `}
             >
-              <User size={16} />
+              <GraduationCap size={16} />
               {t.lms}
             </button>
           </div>
