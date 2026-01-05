@@ -41,7 +41,8 @@ import {
   Edit,
   Eye,
   User,
-  HelpCircle
+  HelpCircle,
+  Plus
 } from 'lucide-react';
 import { StudentUser, UserRole, CompanyGuardianReport, Employee } from './types';
 
