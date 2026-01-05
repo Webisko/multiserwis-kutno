@@ -87,6 +87,17 @@ export interface Student {
   completedLessons: string[]; // Array of lesson IDs that are completed
 }
 
+export interface Employee {
+  id: string;
+  email: string;
+  name: string;
+  phone: string;
+  status: 'active' | 'pending'; // pending = oczekuje na potwierdzenie konta
+  inviteToken?: string; // Token do potwierdzenia konta
+  createdDate: string;
+  assignedCourses?: string[]; // ID kursów przypisanych do pracownika
+}
+
 export interface StudentUser {
   id: string;
   email: string;
@@ -97,6 +108,8 @@ export interface StudentUser {
   profileImage?: string;
   certifications?: Certification[]; // Historia uprawnień
   examHistory?: ExamResult[]; // Historia egzaminów
+  employees?: Employee[]; // Lista pracowników (dla opiekuna firmy)
+  employeeLimit?: number; // Maksymalna liczba pracowników (ustawiana przez admina)
 }
 
 export interface Certification {

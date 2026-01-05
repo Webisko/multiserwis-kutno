@@ -43,7 +43,7 @@ import {
   User,
   HelpCircle
 } from 'lucide-react';
-import { StudentUser, UserRole, CompanyGuardianReport } from './types';
+import { StudentUser, UserRole, CompanyGuardianReport, Employee } from './types';
 
 const App = () => {
   const [currentView, setView] = useState<ViewState>('HOME');
@@ -63,6 +63,9 @@ const App = () => {
   const [openAccordionIndex, setOpenAccordionIndex] = useState<number | null>(null);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [lmsTab, setLmsTab] = useState<'courses' | 'certifications' | 'examHistory'>('courses');
+  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [guardianTab, setGuardianTab] = useState<'employees' | 'reports'>('employees');
 
   // --- SYSTEM ROL UŻYTKOWNIKÓW ---
   const [currentUser, setCurrentUser] = useState<StudentUser | null>(null);
@@ -264,7 +267,45 @@ const App = () => {
     },
     'guardian@test.com': {
       password: 'guardian123',
-      user: { id: 'u4', email: 'guardian@test.com', name: 'Opiekun Firmy ABC', phone: '+48 345 678 901', role: 'COMPANY_GUARDIAN', company: 'ABC Sp. z o.o.' }
+      user: { 
+        id: 'u4', 
+        email: 'guardian@test.com', 
+        name: 'Opiekun Firmy ABC', 
+        phone: '+48 345 678 901', 
+        role: 'COMPANY_GUARDIAN', 
+        company: 'ABC Sp. z o.o.',
+        employeeLimit: 10,
+        employees: [
+          {
+            id: 'emp1',
+            email: 'mateusz.kowalski@abc.pl',
+            name: 'Mateusz Kowalski',
+            phone: '+48 500 111 222',
+            status: 'active',
+            createdDate: '2025-11-15',
+            assignedCourses: ['c1']
+          },
+          {
+            id: 'emp2',
+            email: 'anna.lewandowska@abc.pl',
+            name: 'Anna Lewandowska',
+            phone: '+48 500 222 333',
+            status: 'active',
+            createdDate: '2025-10-20',
+            assignedCourses: ['c2']
+          },
+          {
+            id: 'emp3',
+            email: 'pawel.zawisza@abc.pl',
+            name: 'Paweł Zawisza',
+            phone: '+48 500 333 444',
+            status: 'pending',
+            inviteToken: 'token123',
+            createdDate: '2026-01-03',
+            assignedCourses: ['c1']
+          }
+        ]
+      }
     }
   };
 
@@ -5209,68 +5250,44 @@ const App = () => {
   };
 
   const CompanyGuardianPanelView = () => {
-    // Mock dane pracowników w firmie
-    const companyEmployees: CompanyGuardianReport[] = [
-      {
-        employeeId: 'e1',
-        employeeName: 'Mateusz Kowalski',
-        courseId: 'c1',
-        courseName: 'Operatorzy wózków widłowych - UDT',
-        progress: 85,
-        status: 'active',
-        lastActivityDate: '2026-01-02'
-      },
-      {
-        employeeId: 'e2',
-        employeeName: 'Anna Lewandowska',
-        courseId: 'c2',
-        courseName: 'Ładowarki teleskopowe - SEP',
-        progress: 100,
-        status: 'completed',
-        completedDate: '2025-12-28',
-        lastActivityDate: '2025-12-28'
-      },
-      {
-        employeeId: 'e3',
-        employeeName: 'Paweł Zawisza',
-        courseId: 'c1',
-        courseName: 'Operatorzy wózków widłowych - UDT',
-        progress: 45,
-        status: 'active',
-        lastActivityDate: '2026-01-01'
-      },
-      {
-        employeeId: 'e4',
-        employeeName: 'Katarzyna Wójcik',
-        courseId: 'c3',
-        courseName: 'Szkolenie BHP - Zasady bezpieczeństwa',
-        progress: 10,
-        status: 'active',
-        lastActivityDate: '2025-12-30'
-      }
-    ];
+    const guardianUser = currentUser ?? demoGuardian;
+    const employees = guardianUser?.employees || [];
+    const employeeLimit = guardianUser?.employeeLimit || 0;
+    const activeEmployees = employees.filter(e => e.status === 'active').length;
+    const pendingEmployees = employees.filter(e => e.status === 'pending').length;
 
-    const getStatusBadge = (status: string, progress: number) => {
-      if (status === 'completed') {
-        return <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold">Ukończone</span>;
-      } else if (progress >= 75) {
-        return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">Blisko końca</span>;
-      } else if (progress >= 50) {
-        return <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold">W trakcie</span>;
-      } else {
-        return <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold">Rozpoczęte</span>;
+    const handleAddEmployee = () => {
+      setEditingEmployee(null);
+      setShowEmployeeModal(true);
+    };
+
+    const handleEditEmployee = (employee: Employee) => {
+      setEditingEmployee(employee);
+      setShowEmployeeModal(true);
+    };
+
+    const handleDeleteEmployee = (employeeId: string) => {
+      if (confirm('Czy na pewno chcesz usunąć tego pracownika?')) {
+        // W rzeczywistej aplikacji to by było API call
+        console.log('Usuwanie pracownika:', employeeId);
       }
     };
 
-    const completedCount = companyEmployees.filter(e => e.status === 'completed').length;
-    const activeCount = companyEmployees.filter(e => e.status === 'active').length;
-    const avgProgress = Math.round(companyEmployees.reduce((sum, e) => sum + e.progress, 0) / companyEmployees.length);
-
-    const guardianUser = currentUser ?? demoGuardian;
+    const handleSaveEmployee = (employeeData: Partial<Employee>) => {
+      if (editingEmployee) {
+        // Edycja istniejącego
+        console.log('Edycja pracownika:', editingEmployee.id, employeeData);
+      } else {
+        // Dodawanie nowego
+        console.log('Dodawanie nowego pracownika:', employeeData);
+      }
+      setShowEmployeeModal(false);
+    };
 
     return (
       <div className="min-h-screen bg-slate-50 animate-fade-in">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+          {/* Header */}
           <div className="flex justify-between items-center mb-8 border-b border-slate-200 pb-6">
             <div>
               <h2 className="text-3xl font-heading font-bold text-brand-primary mb-2">Panel Opiekuna Firmy</h2>
@@ -5287,102 +5304,262 @@ const App = () => {
           </div>
 
           {/* Statystyki */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-blue-500">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Pracownicy</h3>
                 <Users size={24} className="text-blue-500" />
               </div>
-              <div className="text-3xl font-bold text-brand-dark mb-1">{companyEmployees.length}</div>
-              <p className="text-xs text-slate-500">Zgłoszeni do szkoleń</p>
+              <div className="text-3xl font-bold text-brand-dark mb-1">{employees.length} / {employeeLimit}</div>
+              <p className="text-xs text-slate-500">Limit: {employeeLimit} pracowników</p>
             </div>
 
             <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-green-500">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Ukończeni</h3>
+                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Aktywni</h3>
                 <CheckCircle size={24} className="text-green-500" />
               </div>
-              <div className="text-3xl font-bold text-brand-dark mb-1">{completedCount}</div>
-              <p className="text-xs text-slate-500">{Math.round(completedCount / companyEmployees.length * 100)}% szkolenia</p>
+              <div className="text-3xl font-bold text-brand-dark mb-1">{activeEmployees}</div>
+              <p className="text-xs text-slate-500">Potwierdzonych kont</p>
             </div>
 
             <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-orange-500">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">W trakcie</h3>
-                <MonitorPlay size={24} className="text-orange-500" />
+                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Oczekujący</h3>
+                <Clock size={24} className="text-orange-500" />
               </div>
-              <div className="text-3xl font-bold text-brand-dark mb-1">{activeCount}</div>
-              <p className="text-xs text-slate-500">Aktywnie uczących się</p>
-            </div>
-
-            <div className="bg-white rounded-sm shadow-sm p-6 border-l-4 border-purple-500">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">Średni postęp</h3>
-                <Trophy size={24} className="text-purple-500" />
-              </div>
-              <div className="text-3xl font-bold text-brand-dark mb-1">{avgProgress}%</div>
-              <p className="text-xs text-slate-500">Wszystkich pracowników</p>
+              <div className="text-3xl font-bold text-brand-dark mb-1">{pendingEmployees}</div>
+              <p className="text-xs text-slate-500">Czekających na potwierdzenie</p>
             </div>
           </div>
 
-          {/* Raporty pracowników */}
-          <div className="bg-white rounded-sm shadow-sm border border-slate-100">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-brand-dark">Raport postępów pracowników</h3>
-              <button className="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white font-bold text-sm rounded-sm hover:bg-brand-dark transition-colors">
-                <Printer size={16} /> Drukuj raport
+          {/* Tabs */}
+          <div className="bg-white rounded-sm shadow-sm border border-slate-100 mb-8">
+            <div className="border-b border-slate-200 flex">
+              <button
+                onClick={() => setGuardianTab('employees')}
+                className={`px-6 py-4 font-bold text-sm transition-colors ${
+                  guardianTab === 'employees'
+                    ? 'text-brand-accent border-b-2 border-brand-accent'
+                    : 'text-slate-500 hover:text-brand-dark'
+                }`}
+              >
+                Zarządzaj pracownikami
+              </button>
+              <button
+                onClick={() => setGuardianTab('reports')}
+                className={`px-6 py-4 font-bold text-sm transition-colors ${
+                  guardianTab === 'reports'
+                    ? 'text-brand-accent border-b-2 border-brand-accent'
+                    : 'text-slate-500 hover:text-brand-dark'
+                }`}
+              >
+                Raporty postępów
               </button>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-100">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Pracownik</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Szkolenie</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Postęp</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Ostatnia aktywność</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {companyEmployees.map((employee) => (
-                    <tr key={employee.employeeId} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-brand-dark text-sm">{employee.employeeName}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-slate-600">{employee.courseName}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-24 bg-slate-200 rounded-full h-2">
-                            <div 
-                              className={`h-2 rounded-full transition-all ${
-                                employee.progress === 100 ? 'bg-green-500' :
-                                employee.progress >= 75 ? 'bg-blue-500' :
-                                employee.progress >= 50 ? 'bg-yellow-500' :
-                                'bg-orange-500'
-                              }`}
-                              style={{ width: `${employee.progress}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-xs font-bold text-slate-600 w-10">{employee.progress}%</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {getStatusBadge(employee.status, employee.progress)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-xs text-slate-500">
-                          {new Date(employee.lastActivityDate).toLocaleDateString('pl-PL')}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+
+            {guardianTab === 'employees' ? (
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-bold text-brand-dark">Lista pracowników</h3>
+                  <button
+                    onClick={handleAddEmployee}
+                    disabled={employees.length >= employeeLimit}
+                    className={`flex items-center gap-2 px-4 py-2 font-bold text-sm rounded-sm transition-colors ${
+                      employees.length >= employeeLimit
+                        ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                        : 'bg-brand-accent text-white hover:bg-brand-primary'
+                    }`}
+                  >
+                    <Plus size={16} /> Dodaj pracownika
+                  </button>
+                </div>
+
+                {employees.length >= employeeLimit && (
+                  <div className="mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <p className="text-sm text-yellow-700">
+                      <strong>Osiągnięto limit pracowników!</strong> Skontaktuj się z administratorem, aby zwiększyć limit.
+                    </p>
+                  </div>
+                )}
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-slate-50 border-b border-slate-100">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Imię i nazwisko</th>
+                        <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Email</th>
+                        <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Telefon</th>
+                        <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Data dodania</th>
+                        <th className="px-6 py-3 text-left text-xs font-bold uppercase text-slate-600">Akcje</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {employees.map((employee) => (
+                        <tr key={employee.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="font-bold text-brand-dark text-sm">{employee.name}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-slate-600">{employee.email}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-slate-600">{employee.phone}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            {employee.status === 'active' ? (
+                              <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold">Aktywny</span>
+                            ) : (
+                              <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold">Oczekuje</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-xs text-slate-500">
+                              {new Date(employee.createdDate).toLocaleDateString('pl-PL')}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleEditEmployee(employee)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                title="Edytuj"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteEmployee(employee.id)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                title="Usuń"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {employees.length === 0 && (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                            Brak pracowników. Kliknij "Dodaj pracownika" aby dodać pierwszego.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-bold text-brand-dark">Raporty postępów pracowników</h3>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white font-bold text-sm rounded-sm hover:bg-brand-dark transition-colors">
+                    <Printer size={16} /> Drukuj raport
+                  </button>
+                </div>
+                <div className="text-center py-12 text-slate-500">
+                  <p>Funkcja raportów będzie dostępna wkrótce.</p>
+                  <p className="text-sm mt-2">Tutaj zobaczysz postępy swoich pracowników w przypisanych szkoleniach.</p>
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+
+        {/* Modal dodawania/edycji pracownika */}
+        {showEmployeeModal && (
+          <EmployeeModal
+            employee={editingEmployee}
+            onClose={() => setShowEmployeeModal(false)}
+            onSave={handleSaveEmployee}
+          />
+        )}
+      </div>
+    );
+  };
+
+  // Komponent Modal dla pracownika
+  const EmployeeModal: React.FC<{
+    employee: Employee | null;
+    onClose: () => void;
+    onSave: (data: Partial<Employee>) => void;
+  }> = ({ employee, onClose, onSave }) => {
+    const [formData, setFormData] = useState({
+      name: employee?.name || '',
+      email: employee?.email || '',
+      phone: employee?.phone || ''
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      onSave(formData);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-sm shadow-lg p-8 w-full max-w-md">
+          <h2 className="text-2xl font-heading font-bold text-brand-dark mb-6">
+            {employee ? 'Edytuj pracownika' : 'Dodaj pracownika'}
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Imię i nazwisko</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent"
+                required
+                disabled={!!employee}
+              />
+              {employee && (
+                <p className="text-xs text-slate-500 mt-1">Email nie może być zmieniony</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Numer telefonu</label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-sm focus:outline-none focus:border-brand-accent"
+                required
+              />
+            </div>
+            {!employee && (
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
+                <p className="text-sm text-blue-700">
+                  Po dodaniu pracownika zostanie wysłany email z linkiem do potwierdzenia konta i ustawienia hasła.
+                </p>
+              </div>
+            )}
+            <div className="flex gap-3 pt-4">
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-brand-accent text-white font-bold rounded-sm hover:bg-brand-primary transition-colors"
+              >
+                {employee ? 'Zapisz zmiany' : 'Dodaj pracownika'}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-sm hover:bg-slate-300 transition-colors"
+              >
+                Anuluj
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     );

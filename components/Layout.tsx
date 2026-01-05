@@ -69,13 +69,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                 </button>
                 
                 {langMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-24 bg-white rounded shadow-lg border border-slate-200 py-1 z-50">
+                  <div className="absolute right-0 top-full mt-2 w-auto bg-white rounded shadow-lg border border-slate-200 py-1 z-50">
                     {(['PL', 'EN', 'UA'] as Language[]).map((lang) => (
                       <div 
                         key={lang}
                         onClick={() => { setLanguage(lang); setLangMenuOpen(false); }}
                         className={`
-                          px-4 py-2 text-xs font-bold cursor-pointer hover:bg-slate-50 flex items-center justify-between
+                          px-4 py-2 text-xs font-bold cursor-pointer hover:bg-slate-50 hover:text-brand-accent flex items-center gap-2
                           ${language === lang ? 'text-brand-accent' : 'text-slate-600'}
                         `}
                       >
