@@ -70,7 +70,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                 
                 {langMenuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-auto bg-white rounded shadow-lg border border-slate-200 py-1 z-50">
-                    {(['PL', 'EN', 'UA'] as Language[]).map((lang) => (
+                    {(['PL', 'UA', 'EN'] as Language[]).map((lang) => (
                       <div 
                         key={lang}
                         onClick={() => { setLanguage(lang); setLangMenuOpen(false); }}
@@ -346,7 +346,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
               
               {/* Mobile Language Switcher */}
               <div className="flex gap-4 pt-2 justify-center">
-                 {(['PL', 'EN', 'UA'] as Language[]).map((lang) => (
+                 {(['PL', 'UA', 'EN'] as Language[]).map((lang) => (
                    <span 
                      key={lang}
                      onClick={() => setLanguage(lang)}
