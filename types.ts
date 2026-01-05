@@ -91,9 +91,73 @@ export interface StudentUser {
   id: string;
   email: string;
   name: string;
+  phone: string; // Required - numer telefonu obowiązkowy
   role: UserRole;
   company?: string;
   profileImage?: string;
+  certifications?: Certification[]; // Historia uprawnień
+  examHistory?: ExamResult[]; // Historia egzaminów
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  courseId: string;
+  courseName: string;
+  issueDate: string;
+  expirationDate: string;
+  status: 'active' | 'expiring-soon' | 'expired'; // expiring-soon = 3-6 miesięcy przed wygaśnięciem
+  certificateUrl?: string;
+}
+
+export interface ExamResult {
+  id: string;
+  courseId: string;
+  courseName: string;
+  examType: 'module' | 'final'; // test po module lub egzamin końcowy
+  moduleId?: string;
+  moduleName?: string;
+  score: number;
+  maxScore: number;
+  passed: boolean;
+  date: string;
+  questionsAnswered: QuestionAnswer[];
+}
+
+export interface QuestionAnswer {
+  questionId: string;
+  question: string;
+  selectedAnswer: number | number[];
+  correctAnswer: number | number[];
+  isCorrect: boolean;
+}
+
+export interface ExamBooking {
+  id: string;
+  userId: string;
+  courseId: string;
+  courseName: string;
+  examDate: string;
+  location: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+}
+
+export interface CourseRecommendation {
+  course: Course;
+  reason: string;
+  discount?: number; // procent zniżki
+  isPackage?: boolean;
+}
+
+export interface CoursePackage {
+  id: string;
+  name: string;
+  description: string;
+  courses: Course[];
+  originalPrice: number;
+  packagePrice: number;
+  discount: number; // procent zniżki
+  savings: number; // kwota oszczędności
 }
 
 export interface CompanyGuardianReport {

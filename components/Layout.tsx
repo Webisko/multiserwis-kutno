@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ViewState, Language } from '../types';
-import { Menu, X, Phone, Mail, GraduationCap, Truck, User, HardHat, ChevronRight, BarChart3, Globe } from 'lucide-react';
+import { Menu, X, Phone, Mail, GraduationCap, Truck, User, HardHat, ChevronRight, BarChart3, Globe, Users, Shield, Building2 } from 'lucide-react';
 import { TRANSLATIONS } from '../constants';
 
 // Helper function for image paths
@@ -28,6 +28,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
   const [trainingMenuOpen, setTrainingMenuOpen] = useState(false);
+  const [panelsMenuOpen, setPanelsMenuOpen] = useState(false);
 
   const t = TRANSLATIONS[language].nav;
 
@@ -107,7 +108,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <span onClick={() => setView('HOME')} className={navItemClass('HOME')}>{t.home}</span>
             
             {/* Szkolenia Dropdown */}
             <div 
@@ -174,7 +174,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
             </div>
             
             <span onClick={() => setView('CONTACT')} className={navItemClass('CONTACT')}>{t.contact}</span>
-            <span onClick={() => setView('ADMIN')} className={navItemClass('ADMIN')}>{t.admin}</span>
             
             {!isLoggedIn ? (
               <button 
@@ -196,18 +195,47 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
               </div>
             )}
             
-            <button 
-              onClick={() => setView('LMS')}
-              className={`
-                flex items-center gap-2 px-5 py-2 rounded-sm font-bold text-sm uppercase tracking-wide transition-all
-                ${currentView === 'LMS' 
-                  ? 'bg-blue-600 text-white shadow-lg' 
-                  : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'}
-              `}
+            {/* Panele Dropdown */}
+            <div 
+              className="relative group"
+              onMouseEnter={() => setPanelsMenuOpen(true)}
+              onMouseLeave={() => setPanelsMenuOpen(false)}
             >
-              <GraduationCap size={16} />
-              {t.lms}
-            </button>
+              <span className={`cursor-pointer text-sm font-bold uppercase tracking-wider transition-colors duration-300 ${currentView === 'ADMIN_PANEL' || currentView === 'LMS' || currentView === 'COMPANY_GUARDIAN_PANEL' ? 'text-brand-accent' : 'text-white hover:text-brand-accent'} flex items-center gap-1`}>
+                Panele <ChevronRight size={14} className={`transform transition-transform ${panelsMenuOpen ? 'rotate-90' : ''}`}/>
+              </span>
+              
+              {panelsMenuOpen && (
+                <div className="absolute right-0 top-full pt-2 w-64 z-50">
+                  <div className="bg-white rounded-sm shadow-xl border border-slate-200 overflow-hidden">
+                    <div 
+                      onClick={() => { setView('ADMIN_PANEL'); setPanelsMenuOpen(false); }}
+                      className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
+                    >
+                      <Shield size={16} /> Panel administratora
+                    </div>
+                    <div 
+                      onClick={() => { setView('ADMIN'); setPanelsMenuOpen(false); }}
+                      className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
+                    >
+                      <BarChart3 size={16} /> Panel managera
+                    </div>
+                    <div 
+                      onClick={() => { setView('COMPANY_GUARDIAN_PANEL'); setPanelsMenuOpen(false); }}
+                      className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
+                    >
+                      <Building2 size={16} /> Strefa opiekuna firmy
+                    </div>
+                    <div 
+                      onClick={() => { setView('LMS'); setPanelsMenuOpen(false); }}
+                      className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
+                    >
+                      <GraduationCap size={16} /> Strefa kursanta
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -220,7 +248,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 w-full bg-brand-primary border-t border-brand-secondary/50 shadow-2xl">
             <div className="flex flex-col p-4 space-y-4">
-              <span onClick={() => { setView('HOME'); setMobileMenuOpen(false); }} className="text-white font-bold py-2 border-b border-brand-secondary/30">{t.home}</span>
               
               {/* Szkolenia Mobile */}
               <div className="border-b border-brand-secondary/30">
@@ -268,9 +295,54 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                 )}
               </div>
               
-              <span onClick={() => { setView('ADMIN'); setMobileMenuOpen(false); }} className="text-white font-bold py-2 border-b border-brand-secondary/30 flex items-center gap-2"><BarChart3 size={16}/> {t.admin}</span>
-              <span onClick={() => { setView('LMS'); setMobileMenuOpen(false); }} className="text-brand-accent font-bold py-2 border-b border-brand-secondary/30 flex items-center gap-2"><User size={16}/> {t.lms}</span>
-              <span onClick={() => { setView('CONTACT'); setMobileMenuOpen(false); }} className="text-white font-bold py-2">{t.contact}</span>
+              <span onClick={() => { setView('CONTACT'); setMobileMenuOpen(false); }} className="text-white font-bold py-2 border-b border-brand-secondary/30">{t.contact}</span>
+              
+              {/* Login/Logout Mobile */}
+              {!isLoggedIn ? (
+                <button 
+                  onClick={() => { onShowLoginModal?.(); setMobileMenuOpen(false); }}
+                  className="text-white font-bold py-2 border-b border-brand-secondary/30 flex items-center gap-2 bg-brand-accent px-4 rounded"
+                >
+                  <User size={16}/> Zaloguj
+                </button>
+              ) : (
+                <div className="flex items-center justify-between border-b border-brand-secondary/30 pb-2">
+                  <span className="text-white text-sm font-bold">{userName}</span>
+                  <button 
+                    onClick={() => { onLogout?.(); setMobileMenuOpen(false); }}
+                    className="px-4 py-2 rounded-sm font-bold text-xs uppercase bg-red-600 text-white"
+                  >
+                    Wyloguj
+                  </button>
+                </div>
+              )}
+              
+              {/* Panele Mobile */}
+              <div className="border-b border-brand-secondary/30">
+                <div 
+                  onClick={() => setPanelsMenuOpen(!panelsMenuOpen)}
+                  className="text-white font-bold py-2 flex items-center justify-between cursor-pointer"
+                >
+                  <span className="flex items-center gap-2"><Users size={16}/> Panele</span>
+                  <ChevronRight size={16} className={`transform transition-transform ${panelsMenuOpen ? 'rotate-90' : ''}`}/>
+                </div>
+                {panelsMenuOpen && (
+                  <div className="pl-6 py-2 space-y-2">
+                    <div onClick={() => { setView('ADMIN_PANEL'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
+                      <Shield size={14}/> Panel administratora
+                    </div>
+                    <div onClick={() => { setView('ADMIN'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
+                      <BarChart3 size={14}/> Panel managera
+                    </div>
+                    <div onClick={() => { setView('COMPANY_GUARDIAN_PANEL'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
+                      <Building2 size={14}/> Strefa opiekuna firmy
+                    </div>
+                    <div onClick={() => { setView('LMS'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
+                      <GraduationCap size={14}/> Strefa kursanta
+                    </div>
+                  </div>
+                )}
+              </div>
               
               {/* Mobile Language Switcher */}
               <div className="flex gap-4 pt-2 justify-center">
