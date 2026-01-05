@@ -1,5 +1,5 @@
 export type ViewState = 'HOME' | 'CATALOG' | 'COURSE_DETAIL' | 'LMS' | 'LESSON_PLAYER' | 'RENTALS' | 'MACHINE_DETAIL' | 'SERVICES' | 'CONTACT' | 'ADMIN' | 'STUDENT_DETAIL' | 'STUDENTS_LIST' | 'ADMIN_PANEL' | 'COMPANY_GUARDIAN_PANEL';
-export type Language = 'PL' | 'EN' | 'DE';
+export type Language = 'PL' | 'EN' | 'UA';
 export type UserRole = 'ADMIN' | 'MANAGER' | 'STUDENT' | 'COMPANY_GUARDIAN';
 
 export interface Course {

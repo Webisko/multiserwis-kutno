@@ -43,22 +43,22 @@ export const TRANSLATIONS = {
       cta2: 'Service & Repairs'
     }
   },
-  DE: {
+  UA: {
     nav: {
-      home: 'Startseite',
-      catalog: 'Schulungen',
-      rentals: 'Vermietung',
-      contact: 'Kontakt',
-      admin: 'Manager-Panel',
-      lms: 'Studentenzone'
+      home: 'Головна',
+      catalog: 'Навчання',
+      rentals: 'Оренда',
+      contact: 'Контакти',
+      admin: 'Панель менеджера',
+      lms: 'Зона курсанта'
     },
     hero: {
-      badge: 'Neue Schulungstermine 2026',
-      title: 'Holen Sie sich das Zertifikat',
-      subtitle: 'online und vor Ort',
-      desc: 'Umfassende UDT-Kurse mit Zugang zur E-Learning-Theorie. Praxis an modernen Geräten.',
-      cta1: 'Kurse durchsuchen',
-      cta2: 'Serviceleistungen'
+      badge: 'Нові терміни навчання 2026',
+      title: 'Отримайте посвідчення оператора',
+      subtitle: 'онлайн та очно',
+      desc: 'Комплексні курси UDT з доступом до теорії в e-learning. Практика на сучасному обладнанні.',
+      cta1: 'Переглянути навчання',
+      cta2: 'Сервісні послуги'
     }
   }
 };
@@ -79,12 +79,12 @@ export const SEO_DATA: Record<Language, SEOMetadata> = {
     ogTitle: 'Get your Telescopic Loader License - Fast & Effective',
     ogDescription: 'Hybrid training: theory at home, practice on site. Sign up today!'
   },
-  DE: {
-    title: 'Teleskoplader Ausbildung UDT (I WJO) | MultiSerwis Polen',
-    description: 'Zertifizierung für Teleskoplader in Kutno. Online-Theorie, staatliche UDT-Prüfung. Höchste Bestehensquote.',
-    keywords: 'teleskoplader schulung, udt polen, staplerschein, baumaschinenkurs',
-    ogTitle: 'Erhalten Sie Ihren Teleskoplader-Führerschein',
-    ogDescription: 'Hybrides Training: Theorie zu Hause, Praxis vor Ort. Melden Sie sich heute an!'
+  UA: {
+    title: 'Курс на телескопічні навантажувачі UDT (I WJO) | MultiSerwis Кутно',
+    description: 'Отримайте посвідчення на телескопічні навантажувачі в Кутно. Теорія онлайн, державний іспит UDT. Найвища прохідність у регіоні.',
+    keywords: 'курс телескопічні навантажувачі, навчання udt польща, посвідчення навантажувача, оператор навантажувача ціна',
+    ogTitle: 'Отримайте посвідчення на телескопічні навантажувачі - швидко і ефективно',
+    ogDescription: 'Гібридне навчання: теорія вдома, практика на майданчику. Записуйтесь сьогодні!'
   }
 };
 
