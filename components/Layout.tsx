@@ -102,7 +102,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-heading font-extrabold text-white leading-none tracking-tight">MULTI<span className="text-brand-accent">SERWIS</span></span>
-              <span className="text-[10px] text-slate-300 font-medium tracking-[0.2em] uppercase leading-none mt-1">Szkolenia & Maszyny</span>
+              <span className="text-[10px] text-slate-300 font-medium tracking-[0.2em] uppercase leading-none mt-1">Profesjonalne Szkolenia</span>
             </div>
           </div>
 
