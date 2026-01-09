@@ -9,6 +9,15 @@ import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
 // ============================================================================
 // PANEL HEADER - wspólny header dla wszystkich paneli
 // ============================================================================
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  type: 'info' | 'warning' | 'success' | 'error';
+}
+
 interface PanelHeaderProps {
   logo?: React.ReactNode;
   sections: { label: string; onClick: () => void }[];
@@ -16,6 +25,7 @@ interface PanelHeaderProps {
   onProfile?: () => void;
   profileEmail?: string;
   notificationCount?: number;
+  notifications?: Notification[];
 }
 
 export const PanelHeader: React.FC<PanelHeaderProps> = ({
@@ -24,9 +34,48 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
   onNotifications,
   onProfile,
   profileEmail,
-  notificationCount = 0
+  notificationCount = 0,
+  notifications = []
 }) => {
   const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+  const [showNotificationsMenu, setShowNotificationsMenu] = React.useState(false);
+  const [expandedNotification, setExpandedNotification] = React.useState<string | null>(null);
+
+  // Mock notifications if none provided
+  const mockNotifications: Notification[] = notifications.length > 0 ? notifications : [
+    {
+      id: '1',
+      title: 'Nowy kursant',
+      message: 'Jan Kowalski zapisał się na kurs "Wózki Widłowe"',
+      timestamp: '5 minut temu',
+      read: false,
+      type: 'info'
+    },
+    {
+      id: '2',
+      title: 'Kurs ukończony',
+      message: 'Anna Nowak ukończyła kurs "BHP Podstawowe" z wynikiem 95%',
+      timestamp: '1 godzina temu',
+      read: false,
+      type: 'success'
+    },
+    {
+      id: '3',
+      title: 'Ceryfikat wygasa',
+      message: 'Certyfikat "Uprawnienia SEP" użytkownika Piotra Wiśniewskiego wygasa za 7 dni',
+      timestamp: '3 godziny temu',
+      read: true,
+      type: 'warning'
+    }
+  ];
+
+  const notificationsToShow = mockNotifications.slice(0, 5);
+  const notificationTypeStyles = {
+    info: 'border-l-blue-500 bg-blue-50',
+    warning: 'border-l-yellow-500 bg-yellow-50',
+    success: 'border-l-green-500 bg-green-50',
+    error: 'border-l-red-500 bg-red-50'
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
@@ -55,10 +104,10 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
 
         {/* Prawe opcje: Notifications + Profile */}
         <div className="flex items-center gap-4">
-          {/* Notifications */}
-          {onNotifications && (
+          {/* Notifications Dropdown */}
+          <div className="relative">
             <button
-              onClick={onNotifications}
+              onClick={() => setShowNotificationsMenu(!showNotificationsMenu)}
               className="relative p-2 text-slate-600 hover:text-brand-accent transition-colors"
               title="Powiadomienia"
             >
@@ -76,12 +125,79 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
                 />
               </svg>
               {notificationCount > 0 && (
-                <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                   {notificationCount}
                 </span>
               )}
             </button>
-          )}
+
+            {showNotificationsMenu && (
+              <div className="absolute right-0 mt-2 w-96 bg-white border border-slate-200 rounded-sm shadow-xl z-50 max-h-96 overflow-y-auto">
+                <div className="px-4 py-3 border-b border-slate-100 bg-slate-50 sticky top-0">
+                  <p className="text-sm font-bold text-slate-700">Powiadomienia ({mockNotifications.length})</p>
+                </div>
+
+                {mockNotifications.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-slate-500">
+                    <p className="text-sm">Brak powiadomień</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-100">
+                    {notificationsToShow.map((notif) => (
+                      <div
+                        key={notif.id}
+                        className={`p-4 cursor-pointer border-l-4 transition-all hover:bg-slate-50 ${
+                          notificationTypeStyles[notif.type]
+                        } ${!notif.read ? 'font-semibold bg-opacity-100' : 'bg-opacity-50'}`}
+                        onClick={() =>
+                          setExpandedNotification(
+                            expandedNotification === notif.id ? null : notif.id
+                          )
+                        }
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-bold text-slate-800 truncate">
+                              {notif.title}
+                            </h4>
+                            <p className={`text-xs mt-1 ${notif.read ? 'text-slate-500' : 'text-slate-600'}`}>
+                              {notif.message}
+                            </p>
+                            <p className="text-xs text-slate-400 mt-2">{notif.timestamp}</p>
+                          </div>
+                          {!notif.read && (
+                            <div className="w-2 h-2 rounded-full bg-brand-accent flex-shrink-0 mt-1"></div>
+                          )}
+                        </div>
+
+                        {expandedNotification === notif.id && (
+                          <div className="mt-3 pt-3 border-t border-current border-opacity-20">
+                            <p className="text-sm text-slate-700 leading-relaxed">{notif.message}</p>
+                            <div className="flex gap-2 mt-3">
+                              <button className="text-xs px-3 py-1 bg-brand-accent text-white rounded hover:opacity-90 transition-opacity">
+                                Przeczytane
+                              </button>
+                              <button className="text-xs px-3 py-1 bg-slate-200 text-slate-700 rounded hover:bg-slate-300 transition-colors">
+                                Zamknij
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {mockNotifications.length > 5 && (
+                  <div className="px-4 py-3 border-t border-slate-100 text-center bg-slate-50 sticky bottom-0">
+                    <button className="text-xs font-bold text-brand-accent hover:text-brand-dark">
+                      Pokaż wszystkie powiadomienia
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Profile Dropdown */}
           <div className="relative">
@@ -192,9 +308,8 @@ export const StatCard: React.FC<StatCardProps> = ({
   trend,
   variant = 'admin'
 }) => {
-  const cardStyle = variant === 'admin' 
-    ? 'bg-white border-l-blue-500'
-    : 'bg-green-50 border-l-green-500';
+  // Unified turquoise color for all variants
+  const cardStyle = 'bg-white border-l-brand-accent';
 
   return (
     <div
@@ -205,11 +320,11 @@ export const StatCard: React.FC<StatCardProps> = ({
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">{title}</h3>
-        {icon && <div className={variant === 'admin' ? 'text-slate-400' : 'text-green-600'}>{icon}</div>}
+        {icon && <div className="text-brand-accent">{icon}</div>}
       </div>
 
       <div className="mb-2">
-        <div className={`text-3xl font-bold ${variant === 'admin' ? 'text-brand-dark' : 'text-green-700'}`}>{value}</div>
+        <div className="text-3xl font-bold text-brand-dark">{value}</div>
       </div>
 
       {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
