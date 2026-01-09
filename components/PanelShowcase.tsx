@@ -75,10 +75,6 @@ export const PanelShowcase: React.FC<PanelShowcaseProps> = ({ onClose }) => {
           </div>
         </div>
       </div>
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* PRZYKŁAD 1: PANEL HEADER */}
       <section className="bg-white border-b border-slate-200 py-6">
