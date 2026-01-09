@@ -17,9 +17,10 @@ interface LayoutProps {
   isLoggedIn?: boolean;
   userName?: string;
   onLogout?: () => void;
+  onShowShowcase?: () => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, language, setLanguage, setCatalogCategory, onShowLoginModal, isLoggedIn, userName, onLogout }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, language, setLanguage, setCatalogCategory, onShowLoginModal, isLoggedIn, userName, onLogout, onShowShowcase }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
@@ -172,6 +173,17 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
             
             <span onClick={() => setView('CONTACT')} className={navItemClass('CONTACT')}>{t.contact}</span>
             
+            {/* Showcase Button */}
+            {onShowShowcase && (
+              <button 
+                onClick={onShowShowcase}
+                className="px-4 py-2 rounded-sm font-bold text-xs uppercase tracking-wide transition-all bg-purple-600 text-white hover:bg-purple-700 shadow-lg flex items-center gap-2"
+                title="Pokaż nowy design paneli"
+              >
+                🎨 Showcase
+              </button>
+            )}
+            
             {!isLoggedIn ? (
               <button 
                 onClick={onShowLoginModal}
@@ -293,6 +305,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
               </div>
               
               <span onClick={() => { setView('CONTACT'); setMobileMenuOpen(false); }} className="text-white font-bold py-2 border-b border-brand-secondary/30">{t.contact}</span>
+              
+              {/* Showcase Button Mobile */}
+              {onShowShowcase && (
+                <button 
+                  onClick={() => { onShowShowcase(); setMobileMenuOpen(false); }}
+                  className="text-white font-bold py-2 border-b border-brand-secondary/30 flex items-center gap-2 bg-purple-600 px-4 rounded"
+                >
+                  🎨 Showcase Nowego Designu
+                </button>
+              )}
               
               {/* Login/Logout Mobile */}
               {!isLoggedIn ? (

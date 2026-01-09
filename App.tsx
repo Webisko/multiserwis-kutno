@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ViewState, Course, Machine, Language, SEOMetadata } from './types';
 import { Layout } from './components/Layout';
+import SectionHeader from './components/SectionHeader';
+import ImagePicker from './components/ImagePicker';
 import LessonTextEditor from './components/LessonTextEditor';
+import { PanelShowcase } from './components/PanelShowcase';
 import { COURSES, MACHINES, MY_COURSES, COURSE_CURRICULUM, ADMIN_STUDENTS, POPULARITY_DATA, TRANSLATIONS, SEO_DATA } from './constants';
 import { 
   ChevronRight, 
@@ -65,6 +68,7 @@ const App = () => {
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [lmsTab, setLmsTab] = useState<'courses' | 'certifications' | 'examHistory'>('courses');
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [showShowcase, setShowShowcase] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [guardianTab, setGuardianTab] = useState<'employees' | 'reports'>('employees');
 
@@ -5631,20 +5635,27 @@ const App = () => {
         isLoggedIn={isLoggedIn}
         userName={currentUser?.name}
         onLogout={handleLogout}
+        onShowShowcase={() => setShowShowcase(true)}
       >
-        {currentView === 'HOME' && <HomeView />}
-        {currentView === 'CATALOG' && <CatalogView />}
-        {currentView === 'COURSE_DETAIL' && <CourseDetailView />}
-        {currentView === 'LMS' && <LMSView />}
-        {currentView === 'LESSON_PLAYER' && <LessonPlayerView />}
-        {currentView === 'RENTALS' && <RentalsView />}
-        {currentView === 'MACHINE_DETAIL' && <MachineDetailView />}
-        {currentView === 'SERVICES' && <ServicesView />}
-        {currentView === 'CONTACT' && <ContactView />}
-        {currentView === 'ADMIN' && <AdminView />}
-        {currentView === 'ADMIN_PANEL' && <AdminPanelView />}
-        {currentView === 'COMPANY_GUARDIAN_PANEL' && <CompanyGuardianPanelView />}
-        {currentView === 'STUDENT_DETAIL' && <StudentDetailView />}
+        {showShowcase ? (
+          <PanelShowcase onClose={() => setShowShowcase(false)} />
+        ) : (
+          <>
+            {currentView === 'HOME' && <HomeView />}
+            {currentView === 'CATALOG' && <CatalogView />}
+            {currentView === 'COURSE_DETAIL' && <CourseDetailView />}
+            {currentView === 'LMS' && <LMSView />}
+            {currentView === 'LESSON_PLAYER' && <LessonPlayerView />}
+            {currentView === 'RENTALS' && <RentalsView />}
+            {currentView === 'MACHINE_DETAIL' && <MachineDetailView />}
+            {currentView === 'SERVICES' && <ServicesView />}
+            {currentView === 'CONTACT' && <ContactView />}
+            {currentView === 'ADMIN' && <AdminView />}
+            {currentView === 'ADMIN_PANEL' && <AdminPanelView />}
+            {currentView === 'COMPANY_GUARDIAN_PANEL' && <CompanyGuardianPanelView />}
+            {currentView === 'STUDENT_DETAIL' && <StudentDetailView />}
+          </>
+        )}
       </Layout>
     </>
   );
