@@ -1,0 +1,384 @@
+import React from 'react';
+import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
+
+/**
+ * Unified Design Components for Admin/Manager/Student/Guardian Panels
+ * Ensures consistency across all panel UIs
+ */
+
+// ============================================================================
+// PANEL HEADER - wspólny header dla wszystkich paneli
+// ============================================================================
+interface PanelHeaderProps {
+  logo?: React.ReactNode;
+  sections: { label: string; onClick: () => void }[];
+  onNotifications?: () => void;
+  onProfile?: () => void;
+  profileEmail?: string;
+  notificationCount?: number;
+}
+
+export const PanelHeader: React.FC<PanelHeaderProps> = ({
+  logo,
+  sections,
+  onNotifications,
+  onProfile,
+  profileEmail,
+  notificationCount = 0
+}) => {
+  const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+
+  return (
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
+      <div className="max-w-full mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
+        {/* Logo / Brand */}
+        <div className="flex items-center gap-8">
+          {logo ? (
+            logo
+          ) : (
+            <div className="text-xl font-heading font-bold text-brand-dark">MultiSerwis</div>
+          )}
+        </div>
+
+        {/* Sekcje - ukryte na mobile */}
+        <div className="hidden md:flex items-center gap-6">
+          {sections.map((section, idx) => (
+            <button
+              key={idx}
+              onClick={section.onClick}
+              className="text-sm font-bold text-slate-600 hover:text-brand-accent transition-colors"
+            >
+              {section.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Prawe opcje: Notifications + Profile */}
+        <div className="flex items-center gap-4">
+          {/* Notifications */}
+          {onNotifications && (
+            <button
+              onClick={onNotifications}
+              className="relative p-2 text-slate-600 hover:text-brand-accent transition-colors"
+              title="Powiadomienia"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+              {notificationCount > 0 && (
+                <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {notificationCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* Profile Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="flex items-center gap-2 p-2 text-slate-600 hover:text-brand-accent transition-colors"
+            >
+              <User size={18} />
+              <ChevronDown size={16} />
+            </button>
+
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-sm shadow-lg z-50">
+                <div className="px-4 py-3 border-b border-slate-100">
+                  <p className="text-sm font-bold text-slate-700">{profileEmail || 'Profil'}</p>
+                </div>
+                <button className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                  <User size={16} /> Mój profil
+                </button>
+                <button className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                  <Settings size={16} /> Ustawienia
+                </button>
+                <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-slate-100">
+                  <LogOut size={16} /> Wyloguj
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+// ============================================================================
+// PANEL TABS - ustandaryzowane tabs
+// ============================================================================
+interface PanelTabsProps {
+  tabs: { id: string; label: string }[];
+  activeTab: string;
+  onChange: (tabId: string) => void;
+  variant?: 'admin' | 'client'; // admin/manager vs kursant/opiekun
+}
+
+export const PanelTabs: React.FC<PanelTabsProps> = ({
+  tabs,
+  activeTab,
+  onChange,
+  variant = 'admin'
+}) => {
+  const borderColor = variant === 'admin' ? 'bg-brand-accent' : 'bg-green-500';
+  const textColor = variant === 'admin' ? 'text-brand-accent' : 'text-green-600';
+  const hoverTextColor = variant === 'admin' ? 'hover:text-slate-700' : 'hover:text-slate-700';
+
+  return (
+    <div className="border-b border-slate-200 bg-white">
+      <div className="flex gap-1 px-4 md:px-8">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => onChange(tab.id)}
+            className={`pb-4 px-4 font-bold text-sm uppercase tracking-wider transition-colors relative ${
+              activeTab === tab.id
+                ? textColor
+                : 'text-slate-500 ' + hoverTextColor
+            }`}
+          >
+            {tab.label}
+            {activeTab === tab.id && (
+              <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${borderColor}`}></div>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// STAT CARD - karty statystyk
+// ============================================================================
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  subtitle?: string;
+  icon?: React.ReactNode;
+  borderColor?: 'blue' | 'green' | 'orange' | 'red' | 'purple';
+  onClick?: () => void;
+  trend?: { value: number; isPositive: boolean };
+  variant?: 'admin' | 'client';
+}
+
+const borderColorMap = {
+  blue: 'border-l-blue-500',
+  green: 'border-l-green-500',
+  orange: 'border-l-orange-500',
+  red: 'border-l-red-500',
+  purple: 'border-l-purple-500'
+};
+
+export const StatCard: React.FC<StatCardProps> = ({
+  title,
+  value,
+  subtitle,
+  icon,
+  borderColor = 'blue',
+  onClick,
+  trend,
+  variant = 'admin'
+}) => {
+  const cardStyle = variant === 'admin' 
+    ? 'bg-white border-l-blue-500'
+    : 'bg-green-50 border-l-green-500';
+
+  return (
+    <div
+      onClick={onClick}
+      className={`rounded-sm shadow-sm p-6 border-l-4 transition-all ${cardStyle} ${
+        onClick ? 'cursor-pointer hover:shadow-md' : ''
+      }`}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-slate-600 font-bold uppercase text-xs tracking-wider">{title}</h3>
+        {icon && <div className={variant === 'admin' ? 'text-slate-400' : 'text-green-600'}>{icon}</div>}
+      </div>
+
+      <div className="mb-2">
+        <div className={`text-3xl font-bold ${variant === 'admin' ? 'text-brand-dark' : 'text-green-700'}`}>{value}</div>
+      </div>
+
+      {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
+
+      {trend && (
+        <div className={`text-xs mt-2 font-bold ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+          {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
+// PANEL TABLE - ustandaryzowana tabela
+// ============================================================================
+interface PanelTableColumn {
+  id: string;
+  label: string;
+  align?: 'left' | 'center' | 'right';
+  render: (row: any, rowIndex: number) => React.ReactNode;
+  sortable?: boolean;
+}
+
+interface PanelTableProps {
+  columns: PanelTableColumn[];
+  data: any[];
+  loading?: boolean;
+  emptyMessage?: string;
+  actions?: {
+    label: string;
+    onClick: (row: any) => void;
+    icon?: React.ReactNode;
+  }[];
+}
+
+export const PanelTable: React.FC<PanelTableProps> = ({
+  columns,
+  data,
+  loading = false,
+  emptyMessage = 'Brak danych',
+  actions
+}) => {
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="text-slate-500">Ładowanie...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="bg-slate-50 border-b border-slate-100">
+          <tr>
+            {columns.map((col) => (
+              <th
+                key={col.id}
+                className={`px-6 py-3 text-left text-xs font-bold uppercase text-slate-600 text-${col.align || 'left'}`}
+              >
+                {col.label}
+              </th>
+            ))}
+            {actions && <th className="px-6 py-3 text-center text-xs font-bold uppercase text-slate-600">Akcje</th>}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {data.length === 0 ? (
+            <tr>
+              <td colSpan={columns.length + (actions ? 1 : 0)} className="px-6 py-8 text-center text-slate-500">
+                {emptyMessage}
+              </td>
+            </tr>
+          ) : (
+            data.map((row, rowIdx) => (
+              <tr key={rowIdx} className="hover:bg-slate-50 transition-colors">
+                {columns.map((col) => (
+                  <td key={col.id} className={`px-6 py-4 text-${col.align || 'left'}`}>
+                    {col.render(row, rowIdx)}
+                  </td>
+                ))}
+                {actions && (
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      {actions.map((action, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => action.onClick(row)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          title={action.label}
+                        >
+                          {action.icon}
+                        </button>
+                      ))}
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+// ============================================================================
+// PANEL LAYOUT - wrapper layout
+// ============================================================================
+interface PanelLayoutProps {
+  header?: React.ReactNode;
+  children: React.ReactNode;
+  sidebarContent?: React.ReactNode;
+}
+
+export const PanelLayout: React.FC<PanelLayoutProps> = ({
+  header,
+  children,
+  sidebarContent
+}) => {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {header && header}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+        <div className="flex gap-8">
+          <div className="flex-1">{children}</div>
+          {sidebarContent && (
+            <aside className="hidden lg:block w-64">{sidebarContent}</aside>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// SECTION HEADER - nagłówek sekcji
+// ============================================================================
+interface SectionHeaderProps {
+  title: string;
+  subtitle?: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+    icon?: React.ReactNode;
+  };
+}
+
+export const SectionHeader: React.FC<SectionHeaderProps> = ({
+  title,
+  subtitle,
+  action
+}) => {
+  return (
+    <div className="flex justify-between items-start mb-6">
+      <div>
+        <h2 className="text-2xl font-heading font-bold text-brand-dark mb-1">{title}</h2>
+        {subtitle && <p className="text-slate-500 text-sm">{subtitle}</p>}
+      </div>
+      {action && (
+        <button
+          onClick={action.onClick}
+          className="flex items-center gap-2 px-4 py-2 bg-brand-accent text-white font-bold text-sm rounded-sm hover:bg-brand-accentHover transition-colors"
+        >
+          {action.icon}
+          {action.label}
+        </button>
+      )}
+    </div>
+  );
+};

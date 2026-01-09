@@ -3,11 +3,8 @@ import { ViewState, Language } from '../types';
 import { Menu, X, Phone, Mail, GraduationCap, Truck, User, HardHat, ChevronRight, BarChart3, Globe, Users, Shield, Building2 } from 'lucide-react';
 import { TRANSLATIONS } from '../constants';
 
-// Helper function for image paths
-const getImagePath = (filename: string) => {
-  const base = import.meta.env.BASE_URL || '/';
-  return `${base}${filename}`.replace('//', '/');
-};
+// Helper function for image paths (kept simple to avoid env typing issues)
+const getImagePath = (filename: string) => filename;
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -188,7 +185,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                 <span className="text-white text-sm font-bold">{userName}</span>
                 <button 
                   onClick={onLogout}
-                  className="px-4 py-2 rounded-sm font-bold text-xs uppercase tracking-wide bg-red-600 text-white hover:bg-red-700 transition-colors"
+                  className="px-4 py-2 rounded-sm font-bold text-xs uppercase tracking-wide bg-brand-accent text-white hover:bg-brand-accentHover transition-colors"
                 >
                   Wyloguj
                 </button>
@@ -310,7 +307,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                   <span className="text-white text-sm font-bold">{userName}</span>
                   <button 
                     onClick={() => { onLogout?.(); setMobileMenuOpen(false); }}
-                    className="px-4 py-2 rounded-sm font-bold text-xs uppercase bg-red-600 text-white"
+                    className="px-4 py-2 rounded-sm font-bold text-xs uppercase bg-brand-accent text-white hover:bg-brand-accentHover"
                   >
                     Wyloguj
                   </button>

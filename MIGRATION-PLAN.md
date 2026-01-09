@@ -1,6 +1,8 @@
 # 🚀 PLAN MIGRACJI: Vite → Next.js 14
 
-## Status: FAZA 1 - Migracja Frontendowa
+## Status: FAZA 1 - Backend na VPS (Next.js jako docelowy front)
+
+> Kolejność prac: (1) backend + baza + API lokalnie, (2) migracja frontu do Next.js, (3) deployment na VPS z nginx + PM2, (4) wideo z Bunny CDN.
 
 ---
 
@@ -12,12 +14,18 @@ git checkout -b migration-to-nextjs
 git push -u origin migration-to-nextjs
 ```
 
-### 1.2 Sprawdź hosting Seohost.pl
-- [ ] Zaloguj się do panelu
-- [ ] Sprawdź Node.js version (≥18.17 wymagane)
-- [ ] Sprawdź MySQL version
-- [ ] Sprawdź czy jest SSH access
-- [ ] Sprawdź dostępne deployment options
+### 1.2 Sprawdź hosting klienta (VPS)
+- [ ] SSH/sudo dostęp, OS (preferowany Ubuntu 22.04/24.04)
+- [ ] Node.js (≥18.17, najlepiej 20 LTS)
+- [ ] Reverse proxy (nginx) + certbot/SSL
+- [ ] Baza danych (MySQL/MariaDB lub Postgres) + porty/firewall
+- [ ] PM2/systemd dostępne do utrzymania procesu
+- [ ] Dysk/transfer pod wideo (same wideo pójdzie na Bunny CDN)
+
+### 1.3 Wideo na Bunny CDN
+- [ ] Library/Stream ID i API Key (Bunny)
+- [ ] Ustalić pattern URL (HLS/MP4) i ewentualne signed URLs
+- [ ] Domyślna jakość + fallbacki mobilne
 
 ---
 
@@ -231,20 +239,25 @@ Stwórz `.env.local`:
 ```env
 NEXT_PUBLIC_SITE_URL=https://multiserwis-kutno.pl
 DATABASE_URL=mysql://user:pass@localhost:3306/dbname
+BUNNY_STREAM_LIBRARY_ID=xxx
+BUNNY_STREAM_API_KEY=xxx
+BUNNY_PULL_ZONE_URL=https://cdn.bunny.net/stream/xxx
 ```
 
 ---
 
-## KROK 8: DEPLOYMENT NA SEOHOST (1 godzina)
+## KROK 8: DEPLOYMENT NA VPS (1 godzina)
 
-### 8.1 Opcja A: Node.js Hosting
+### 8.1 Opcja A: Node.js (VPS)
 ```bash
-# Na serwerze przez SSH:
-cd /home/username/domains/multiserwis-kutno.pl
+# Na VPS przez SSH:
+cd /var/www/multiserwis-kutno
 git clone https://github.com/Webisko/multiserwis-kutno.git .
 npm install
 npm run build
-npm start
+pm2 start npm --name "multiserwis" -- start
+pm2 save
+pm2 startup
 ```
 
 ### 8.2 Opcja B: Static Export (jeśli Node.js niedostępny)
@@ -260,20 +273,19 @@ npm run build
 # Upload folder 'out/' przez FTP do public_html
 ```
 
-### 8.3 Nginx/Apache config
-Jeśli Node.js:
+### 8.3 Nginx/Apache config (Node.js)
 ```nginx
 server {
-    server_name multiserwis-kutno.pl;
+  server_name klientowa-domena.pl;
     
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
+  location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+  }
 }
 ```
 
@@ -340,9 +352,9 @@ import Image from 'next/image'
 import '../styles/globals.css'
 ```
 
-### Problem 4: Seohost nie wspiera Node.js
+### Problem 4: Hosting nie obsługuje Node.js
 **Rozwiązanie:** Static export (output: 'export')  
-**Ograniczenia:** Brak API routes, trzeba będzie osobny backend
+**Ograniczenia:** Brak API routes, potrzebny osobny backend
 
 ---
 
@@ -386,11 +398,11 @@ Po zakończeniu i przetestowaniu Fazy 1, rozpoczniemy:
 
 ## ❓ PYTANIA PRZED STARTEM
 
-1. **Czy masz dostęp SSH do Seohost.pl?**
-2. **Jaka wersja Node.js jest dostępna?** (sprawdź w panelu)
-3. **Czy możesz zainstalować własne pakiety npm?**
-4. **Czy jest opcja PM2/forever do zarządzania procesem Node?**
-5. **Czy masz dostęp do phpMyAdmin (MySQL)?**
+1. **Czy masz SSH/sudo na VPS klienta?**
+2. **Jaka wersja Node.js jest dostępna (≥18/20)?**
+3. **Jaka baza danych będzie na VPS (MySQL/MariaDB czy Postgres)?**
+4. **Czy użyjemy PM2/systemd + nginx z certbot?**
+5. **Czy masz dane do Bunny CDN (Library/Stream ID + API key)?**
 
 Odpowiedz na te pytania, a będę wiedział jak skonfigurować deployment.
 
