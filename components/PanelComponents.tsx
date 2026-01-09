@@ -248,9 +248,10 @@ export const PanelTabs: React.FC<PanelTabsProps> = ({
   onChange,
   variant = 'admin'
 }) => {
-  const borderColor = variant === 'admin' ? 'bg-brand-accent' : 'bg-green-500';
-  const textColor = variant === 'admin' ? 'text-brand-accent' : 'text-green-600';
-  const hoverTextColor = variant === 'admin' ? 'hover:text-slate-700' : 'hover:text-slate-700';
+  // Unified brand accent for both admin/client variants
+  const borderColor = 'bg-brand-accent';
+  const textColor = 'text-brand-accent';
+  const hoverTextColor = 'hover:text-slate-700';
 
   return (
     <div className="border-b border-slate-200 bg-white">

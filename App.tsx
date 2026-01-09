@@ -5,6 +5,7 @@ import SectionHeader from './components/SectionHeader';
 import ImagePicker from './components/ImagePicker';
 import LessonTextEditor from './components/LessonTextEditor';
 import { PanelShowcase } from './components/PanelShowcase';
+import { PanelHeader, PanelTabs, StatCard, PanelTable, PanelLayout, SectionHeader as PanelSectionHeader } from './components/PanelComponents';
 import { COURSES, MACHINES, MY_COURSES, COURSE_CURRICULUM, ADMIN_STUDENTS, POPULARITY_DATA, TRANSLATIONS, SEO_DATA } from './constants';
 import { 
   ChevronRight, 
@@ -45,9 +46,12 @@ import {
   Eye,
   User,
   HelpCircle,
-  Plus
+  Plus,
+  TrendingUp
 } from 'lucide-react';
 import { StudentUser, UserRole, CompanyGuardianReport, Employee } from './types';
+
+type NewPanelKey = 'admin' | 'manager' | 'guardian' | 'student';
 
 const App = () => {
   const [currentView, setView] = useState<ViewState>('HOME');
@@ -348,6 +352,16 @@ const App = () => {
     setCurrentUser(null);
     setIsLoggedIn(false);
     setView('HOME');
+  };
+
+  const handleShowNewPanel = (panel: NewPanelKey) => {
+    const viewMap: Record<NewPanelKey, ViewState> = {
+      admin: 'NEW_ADMIN_PANEL',
+      manager: 'NEW_MANAGER_PANEL',
+      guardian: 'NEW_GUARDIAN_PANEL',
+      student: 'NEW_STUDENT_PANEL'
+    };
+    setView(viewMap[panel]);
   };
 
   // Get program details for each course
@@ -5484,6 +5498,329 @@ const App = () => {
     );
   };
 
+  // ============================================================================
+  // NOWE WERSJE PANELI - z użyciem nowego design systemu
+  // ============================================================================
+
+  const NewAdminPanelView = () => {
+    const [activeTab, setActiveTab] = useState('dashboard');
+    
+    return (
+      <PanelLayout
+        header={
+          <PanelHeader
+            sections={[
+              { label: 'Dashboard', onClick: () => setActiveTab('dashboard') },
+              { label: 'Kursy', onClick: () => setActiveTab('courses') },
+              { label: 'Użytkownicy', onClick: () => setActiveTab('users') },
+              { label: 'Raporty', onClick: () => setActiveTab('reports') }
+            ]}
+            profileEmail="admin@multiserwis.pl"
+            notificationCount={5}
+          />
+        }
+      >
+        <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
+          <PanelSectionHeader
+            title="Panel Administratora - Nowa Wersja"
+            subtitle="Zarządzanie całą platformą z nowym interfejsem"
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+            <StatCard
+              title="Kursanci"
+              value="247"
+              subtitle="Aktywnych użytkowników"
+              icon={<Users size={20} />}
+              variant="admin"
+              trend={{ value: 12, isPositive: true }}
+            />
+            <StatCard
+              title="Kursy"
+              value="18"
+              subtitle="Dostępnych szkoleń"
+              icon={<GraduationCap size={20} />}
+              variant="admin"
+            />
+            <StatCard
+              title="Zdawalność"
+              value="89%"
+              subtitle="Średni wskaźnik"
+              icon={<TrendingUp size={20} />}
+              variant="admin"
+              trend={{ value: 5, isPositive: true }}
+            />
+            <StatCard
+              title="Oczekujące"
+              value="12"
+              subtitle="Do zatwierdzenia"
+              icon={<Clock size={20} />}
+              variant="admin"
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-sm shadow-sm p-6">
+          <PanelSectionHeader
+            title="Ostatnia aktywność"
+            subtitle="Najnowsze zdarzenia w systemie"
+          />
+          <div className="mt-4 text-slate-500 text-center py-8">
+            Tutaj będzie lista ostatnich zdarzeń w systemie
+          </div>
+        </div>
+      </PanelLayout>
+    );
+  };
+
+  const NewManagerPanelView = () => {
+    const [activeTab, setActiveTab] = useState('overview');
+    
+    return (
+      <PanelLayout
+        header={
+          <PanelHeader
+            sections={[
+              { label: 'Przegląd', onClick: () => setActiveTab('overview') },
+              { label: 'Kursy', onClick: () => setActiveTab('courses') },
+              { label: 'Statystyki', onClick: () => setActiveTab('stats') }
+            ]}
+            profileEmail="manager@multiserwis.pl"
+            notificationCount={3}
+          />
+        }
+      >
+        <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
+          <PanelSectionHeader
+            title="Panel Managera - Nowa Wersja"
+            subtitle="Nadzór nad kursami i użytkownikami"
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+            <StatCard
+              title="Aktywni Kursanci"
+              value="189"
+              subtitle="W trakcie szkoleń"
+              icon={<Users size={20} />}
+              variant="admin"
+            />
+            <StatCard
+              title="Kursy w toku"
+              value="12"
+              subtitle="Aktywne szkolenia"
+              icon={<GraduationCap size={20} />}
+              variant="admin"
+            />
+            <StatCard
+              title="Ukończenia"
+              value="156"
+              subtitle="W tym miesiącu"
+              icon={<Trophy size={20} />}
+              variant="admin"
+              trend={{ value: 18, isPositive: true }}
+            />
+            <StatCard
+              title="Średnia ocen"
+              value="4.7"
+              subtitle="Na 5.0"
+              icon={<Star size={20} />}
+              variant="admin"
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-sm shadow-sm p-6">
+          <PanelSectionHeader
+            title="Nadchodzące szkolenia"
+            subtitle="Zaplanowane sesje"
+          />
+          <div className="mt-4 text-slate-500 text-center py-8">
+            Lista zaplanowanych szkoleń
+          </div>
+        </div>
+      </PanelLayout>
+    );
+  };
+
+  const NewGuardianPanelView = () => {
+    const guardianUser = currentUser ?? demoGuardian;
+    const employees = guardianUser?.employees || [];
+    const employeeLimit = guardianUser?.employeeLimit || 0;
+    const activeEmployees = employees.filter(e => e.status === 'active').length;
+    
+    return (
+      <PanelLayout
+        header={
+          <PanelHeader
+            sections={[
+              { label: 'Pracownicy', onClick: () => setGuardianTab('employees') },
+              { label: 'Raporty', onClick: () => setGuardianTab('reports') }
+            ]}
+            profileEmail={guardianUser?.email || "guardian@multiserwis.pl"}
+            notificationCount={2}
+          />
+        }
+      >
+        <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
+          <PanelSectionHeader
+            title="Strefa Opiekuna Firmy - Nowa Wersja"
+            subtitle={`Zarządzanie pracownikami - ${guardianUser?.company || 'Demo Sp. z o.o.'}`}
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <StatCard
+              title="Pracownicy"
+              value={`${employees.length} / ${employeeLimit}`}
+              subtitle={`Limit: ${employeeLimit} pracowników`}
+              icon={<Users size={20} />}
+              variant="client"
+            />
+            <StatCard
+              title="Aktywni"
+              value={activeEmployees.toString()}
+              subtitle="Potwierdzonych kont"
+              icon={<CheckCircle size={20} />}
+              variant="client"
+            />
+            <StatCard
+              title="Oczekujący"
+              value={(employees.length - activeEmployees).toString()}
+              subtitle="Czekających na potwierdzenie"
+              icon={<Clock size={20} />}
+              variant="client"
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-sm shadow-sm p-6">
+          <PanelSectionHeader
+            title="Lista pracowników"
+            subtitle="Zarządzaj dostępem do szkoleń"
+            action={{
+              label: 'Dodaj pracownika',
+              onClick: () => setShowEmployeeModal(true),
+              icon: <Plus size={16} />
+            }}
+          />
+          
+          {employees.length > 0 ? (
+            <PanelTable
+              columns={[
+                {
+                  id: 'name',
+                  label: 'Imię i nazwisko',
+                  render: (row) => <div className="font-bold text-brand-dark">{row.name}</div>
+                },
+                {
+                  id: 'email',
+                  label: 'Email',
+                  render: (row) => <div className="text-slate-600">{row.email}</div>
+                },
+                {
+                  id: 'status',
+                  label: 'Status',
+                  render: (row) => (
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      row.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'
+                    }`}>
+                      {row.status === 'active' ? 'Aktywny' : 'Oczekuje'}
+                    </span>
+                  )
+                }
+              ]}
+              data={employees}
+              actions={[
+                {
+                  label: 'Edytuj',
+                  onClick: (row) => console.log('Edit', row),
+                  icon: <Edit size={16} />
+                },
+                {
+                  label: 'Usuń',
+                  onClick: (row) => console.log('Delete', row),
+                  icon: <Trash2 size={16} />
+                }
+              ]}
+            />
+          ) : (
+            <div className="mt-4 text-center py-8 text-slate-500">
+              Brak pracowników. Dodaj pierwszego pracownika.
+            </div>
+          )}
+        </div>
+      </PanelLayout>
+    );
+  };
+
+  const NewStudentPanelView = () => {
+    const studentUser = currentUser ?? demoStudent;
+    
+    return (
+      <PanelLayout
+        header={
+          <PanelHeader
+            sections={[
+              { label: 'Moje Kursy', onClick: () => setLmsTab('courses') },
+              { label: 'Certyfikaty', onClick: () => setLmsTab('certifications') },
+              { label: 'Historia', onClick: () => setLmsTab('examHistory') }
+            ]}
+            profileEmail={studentUser?.email || "student@multiserwis.pl"}
+            notificationCount={1}
+          />
+        }
+      >
+        <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
+          <PanelSectionHeader
+            title="Strefa Kursanta - Nowa Wersja"
+            subtitle={`Witaj, ${studentUser?.name || 'Kursant'}!`}
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+            <StatCard
+              title="Moje Kursy"
+              value="5"
+              subtitle="W trakcie nauki"
+              icon={<GraduationCap size={20} />}
+              variant="client"
+            />
+            <StatCard
+              title="Certyfikaty"
+              value="3"
+              subtitle="Zdobyte"
+              icon={<Award size={20} />}
+              variant="client"
+            />
+            <StatCard
+              title="Średni Postęp"
+              value="68%"
+              subtitle="Wszystkich kursów"
+              icon={<TrendingUp size={20} />}
+              variant="client"
+              trend={{ value: 8, isPositive: true }}
+            />
+            <StatCard
+              title="Wygasające"
+              value="2"
+              subtitle="Certyfikaty do odnowienia"
+              icon={<Clock size={20} />}
+              variant="client"
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-sm shadow-sm p-6">
+          <PanelSectionHeader
+            title="Moje aktywne kursy"
+            subtitle="Kontynuuj naukę"
+          />
+          <div className="mt-4 text-slate-500 text-center py-8">
+            Lista aktywnych kursów kursanta
+          </div>
+        </div>
+      </PanelLayout>
+    );
+  };
+
   // Komponent Modal dla pracownika
   const EmployeeModal: React.FC<{
     employee: Employee | null;
@@ -5636,6 +5973,7 @@ const App = () => {
         userName={currentUser?.name}
         onLogout={handleLogout}
         onShowShowcase={() => setShowShowcase(true)}
+        onShowNewPanel={handleShowNewPanel}
       >
         {showShowcase ? (
           <PanelShowcase onClose={() => setShowShowcase(false)} />
@@ -5653,6 +5991,10 @@ const App = () => {
             {currentView === 'ADMIN' && <AdminView />}
             {currentView === 'ADMIN_PANEL' && <AdminPanelView />}
             {currentView === 'COMPANY_GUARDIAN_PANEL' && <CompanyGuardianPanelView />}
+            {currentView === 'NEW_ADMIN_PANEL' && <NewAdminPanelView />}
+            {currentView === 'NEW_MANAGER_PANEL' && <NewManagerPanelView />}
+            {currentView === 'NEW_GUARDIAN_PANEL' && <NewGuardianPanelView />}
+            {currentView === 'NEW_STUDENT_PANEL' && <NewStudentPanelView />}
             {currentView === 'STUDENT_DETAIL' && <StudentDetailView />}
           </>
         )}

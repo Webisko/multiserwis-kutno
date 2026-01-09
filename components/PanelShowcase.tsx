@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   PanelHeader,
   PanelTabs,
@@ -16,11 +16,25 @@ import { Users, GraduationCap, TrendingUp, Clock, Edit, Trash2, Eye } from 'luci
 
 interface PanelShowcaseProps {
   onClose?: () => void;
+  initialVariant?: 'admin' | 'client';
+  initialPanelLabel?: string;
+  focusLayout?: boolean;
 }
 
-export const PanelShowcase: React.FC<PanelShowcaseProps> = ({ onClose }) => {
-  const [activeVariant, setActiveVariant] = useState<'admin' | 'client'>('admin');
+export const PanelShowcase: React.FC<PanelShowcaseProps> = ({ onClose, initialVariant = 'admin', initialPanelLabel, focusLayout }) => {
+  const [activeVariant, setActiveVariant] = useState<'admin' | 'client'>(initialVariant);
   const [activeTab, setActiveTab] = useState('overview');
+  const layoutRef = React.useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setActiveVariant(initialVariant);
+  }, [initialVariant]);
+
+  useEffect(() => {
+    if (focusLayout && layoutRef.current) {
+      layoutRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [focusLayout]);
 
   // Mock data dla tabel
   const mockStudents = [
@@ -43,6 +57,11 @@ export const PanelShowcase: React.FC<PanelShowcaseProps> = ({ onClose }) => {
           <h1 className="text-2xl font-heading font-bold text-brand-dark">
             🎨 Showcase Nowego Designu
           </h1>
+          {initialPanelLabel && (
+            <span className="px-3 py-1 text-xs font-bold bg-brand-accent text-white rounded-sm shadow-sm">
+              Podgląd: {initialPanelLabel}
+            </span>
+          )}
           <div className="flex gap-2 items-center">
             <button
               onClick={() => setActiveVariant('admin')}
@@ -337,7 +356,7 @@ export const PanelShowcase: React.FC<PanelShowcaseProps> = ({ onClose }) => {
       </section>
 
       {/* PRZYKŁAD 7: PEŁNY LAYOUT */}
-      <section className="bg-slate-50 py-6 border-t-4 border-brand-accent">
+      <section className="bg-slate-50 py-6 border-t-4 border-brand-accent" ref={layoutRef}>
         <div className="max-w-7xl mx-auto px-8">
           <h2 className="text-xl font-bold mb-4 text-slate-700">7. Panel Layout - Kompletny układ (Interaktywny)</h2>
           <p className="text-sm text-slate-600 mb-4">
