@@ -7,6 +7,9 @@ interface CoursesCatalogProps {
   title?: string;
   subtitle?: string;
   courses: Course[];
+  variant?: 'table' | 'tiles';
+  onBuyCourse?: (courseId: string) => void;
+  buyLabel?: string;
   onCreateCourse?: () => void;
   onEditCourse?: (courseId: string) => void;
   onPreviewCourse: (courseId: string) => void;
@@ -17,6 +20,9 @@ export const CoursesCatalog: React.FC<CoursesCatalogProps> = ({
   title = 'Katalog szkoleń',
   subtitle = 'Zarządzaj szkoleniami i modułami szkoleniowymi.',
   courses,
+  variant = 'table',
+  onBuyCourse,
+  buyLabel = 'Kup szkolenie',
   onCreateCourse,
   onEditCourse,
   onPreviewCourse,
@@ -57,6 +63,8 @@ export const CoursesCatalog: React.FC<CoursesCatalogProps> = ({
     });
     return map;
   }, []);
+
+  const tilesVariant = variant === 'tiles';
 
   return (
     <div className="space-y-6">
@@ -118,6 +126,90 @@ export const CoursesCatalog: React.FC<CoursesCatalogProps> = ({
           </div>
         </div>
 
+        {tilesVariant ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filtered.map((course) => {
+              const promo = getPromo(course);
+              return (
+                <div
+                  key={course.id}
+                  onClick={() => onPreviewCourse(course.id)}
+                  className="bg-white rounded-sm shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group border border-slate-100 cursor-pointer"
+                >
+                  <div className="relative aspect-[3/2] overflow-hidden">
+                    <div className="absolute inset-0 bg-brand-dark/20 group-hover:bg-brand-dark/0 transition-colors z-10"></div>
+                    {course.image ? (
+                      <img
+                        src={course.image}
+                        alt={course.title}
+                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold">
+                        {course.title.slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
+                    {(course as any).isPopular ? (
+                      <span className="absolute top-4 right-4 z-20 bg-brand-accent text-white text-xs font-bold px-3 py-1 uppercase rounded-sm shadow-md">
+                        Popularny
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="p-6 flex flex-col flex-grow">
+                    <div className="text-xs font-bold text-brand-secondary uppercase mb-2">{course.category}</div>
+                    <h3 className="text-lg font-heading font-bold text-brand-dark mb-4 leading-snug group-hover:text-brand-accent transition-colors">
+                      {course.title}
+                    </h3>
+
+                    {course.description ? (
+                      <p className="text-base text-slate-600 mb-4 line-clamp-3">{course.description}</p>
+                    ) : null}
+
+                    <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-500 uppercase">Cena</span>
+                        {promo ? (
+                          <div className="leading-tight">
+                            <div className="text-xs text-slate-400 line-through font-semibold">{course.price}</div>
+                            <div className="text-lg font-bold text-brand-accent">{promo}</div>
+                          </div>
+                        ) : (
+                          <span className="text-lg font-bold text-brand-primary">{course.price}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPreviewCourse(course.id);
+                        }}
+                        className="w-full py-3 border border-brand-primary text-brand-primary font-bold uppercase text-xs hover:bg-brand-primary hover:text-white transition-all rounded-sm"
+                      >
+                        Szczegóły
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onBuyCourse) onBuyCourse(course.id);
+                          else onPreviewCourse(course.id);
+                        }}
+                        className="w-full py-3 bg-brand-accent text-white font-bold uppercase text-xs hover:bg-brand-accentHover transition-all rounded-sm"
+                      >
+                        {buyLabel}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -313,6 +405,7 @@ export const CoursesCatalog: React.FC<CoursesCatalogProps> = ({
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   );

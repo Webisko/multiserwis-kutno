@@ -6163,7 +6163,13 @@ const App = () => {
             title="Katalog szkoleń"
             subtitle="Przeglądaj szkolenia dostępne w systemie."
             courses={panelCourses}
+            variant="tiles"
             onPreviewCourse={openStudentTrainingPreview}
+            onBuyCourse={(courseId) => {
+              setSelectedCourseId(courseId);
+              setView('CONTACT');
+            }}
+            buyLabel="Kup"
           />
         )}
 
