@@ -5,6 +5,8 @@ import SectionHeader from './components/SectionHeader';
 import ImagePicker from './components/ImagePicker';
 import LessonTextEditor from './components/LessonTextEditor';
 import { PanelHeader, PanelTabs, StatCard, PanelTable, PanelLayout, SectionHeader as PanelSectionHeader } from './components/PanelComponents';
+import { BrandMark } from './components/BrandMark';
+import { PanelFooter } from './components/panel/PanelFooter';
 import { AdminPanelLayout } from './components/admin/AdminPanelLayout';
 import type { AdminSectionId } from './components/admin/AdminPanelLayout';
 import { AdminDashboard } from './components/admin/AdminDashboard';
@@ -1971,7 +1973,6 @@ const App = () => {
     // Determine active lesson based on mock data (e.g., first incomplete one)
     // For demo purposes, we will default to the 2nd lesson of 2nd module as "active"
     const activeLessonId = currentLessonId; 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
 
     const modulesForCourse = selectedCourseId
       ? COURSE_CURRICULUM.filter((m) => m.courseId === selectedCourseId)
@@ -2012,51 +2013,31 @@ const App = () => {
     const currentLesson = allLessons[currentLessonIndex];
 
     return (
-      <div className="min-h-screen bg-slate-100 flex flex-col font-body animate-fade-in">
-        <div className="max-w-7xl mx-auto w-full flex-grow flex flex-col md:flex-row gap-6 p-4 md:p-8">
-          
-          {/* Main Content Area - Left/Top on mobile */}
-          <div className="flex-grow w-full md:w-3/4 flex flex-col gap-6 order-2 md:order-1">
-            
-            {/* Header & Breadcrumbs */}
-            <div className="flex items-center justify-between">
-               <div>
-                  <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
-                    <span
-                      onClick={() => setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG')}
-                      className="cursor-pointer hover:text-brand-accent"
-                    >
-                      Moje Szkolenia
-                    </span>{' '}
-                    <ChevronRight size={12} /> 
-                    <span>{activeCourseTitle}</span>
-                  </div>
-                  <h1 className="text-2xl font-heading font-bold text-brand-dark">{currentLesson?.title || 'Bezpieczeństwo wymiany butli LPG'}</h1>
-               </div>
-               <div className="flex items-center gap-2">
-                  {isFromAdmin && adminEditingCourseId && (
-                    <button 
-                      onClick={() => {
-                        // Zapisz informację o powrocie do edycji w localStorage
-                        localStorage.setItem('returnToEditCourseId', adminEditingCourseId);
-                        
-                        setIsFromAdmin(false);
-                        setAdminEditingCourseId(null);
-                        setView('NEW_ADMIN_PANEL');
-                      }}
-                      className="hidden md:flex items-center gap-2 px-4 py-2 bg-brand-accent text-white font-bold text-sm rounded-sm hover:bg-brand-accentHover transition-colors"
-                    >
-                      <ChevronRight size={16} className="rotate-180" /> Powrót do edycji
-                    </button>
-                  )}
-                  <button 
-                     className="md:hidden p-2 bg-white rounded shadow text-brand-dark"
-                     onClick={() => setSidebarOpen(!sidebarOpen)}
-                  >
-                     <Menu size={20} />
-                  </button>
-               </div>
+      <div className="w-full flex flex-col gap-6 font-body animate-fade-in">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+              <span>Moje szkolenia</span>
+              <ChevronRight size={12} />
+              <span>{activeCourseTitle}</span>
             </div>
+            <h1 className="mt-1 text-2xl font-heading font-bold text-slate-900">{currentLesson?.title || 'Lekcja'}</h1>
+          </div>
+
+          {isFromAdmin && adminEditingCourseId ? (
+            <button
+              onClick={() => {
+                localStorage.setItem('returnToEditCourseId', adminEditingCourseId);
+                setIsFromAdmin(false);
+                setAdminEditingCourseId(null);
+                setView('NEW_ADMIN_PANEL');
+              }}
+              className="hidden md:flex items-center gap-2 px-4 py-2 bg-brand-accent text-white font-bold text-sm rounded-sm hover:bg-brand-accentHover transition-colors"
+            >
+              <ChevronRight size={16} className="rotate-180" /> Powrót do edycji
+            </button>
+          ) : null}
+        </div>
 
             {/* Lesson Content - Video, Text, or Test */}
             {currentLesson?.type === 'video' && (
@@ -2410,88 +2391,6 @@ const App = () => {
               </button>
             </div>
             )}
-
-          </div>
-
-          {/* Sidebar - Right/Bottom on mobile */}
-          <div className={`
-             w-full md:w-1/4 flex-shrink-0 bg-white border border-slate-200 shadow-sm rounded-sm order-1 md:order-2
-             md:sticky md:top-20 md:max-h-[calc(100vh-6rem)] md:overflow-hidden md:flex md:flex-col
-             ${sidebarOpen ? 'block' : 'hidden md:flex'}
-          `}>
-             <div className="p-4 bg-brand-primary text-white rounded-t-sm flex-shrink-0">
-                <div className="text-xs font-bold uppercase text-brand-accent tracking-widest mb-1">Twój postęp</div>
-                <div className="flex justify-between items-end mb-2">
-                   <span className="text-2xl font-heading font-bold">45%</span>
-                   <span className="text-xs text-slate-300 mb-1">ukończono</span>
-                </div>
-                <div className="w-full bg-brand-dark/50 rounded-full h-1.5">
-                   <div className="bg-brand-accent h-1.5 rounded-full" style={{ width: '45%' }}></div>
-                </div>
-             </div>
-
-             <div className="overflow-y-auto flex-1">
-                 {modulesForCourse.map((module) => (
-                   <div key={module.id} className="border-b border-slate-100 last:border-0">
-                      <div className="bg-slate-50 px-4 py-3 text-xs font-bold uppercase text-slate-600 tracking-wider flex justify-between items-center sticky top-0 z-10 border-b border-slate-200">
-                         {module.title}
-                      </div>
-                      <div>
-                         {module.lessons.map((lesson) => {
-                           const isActive = lesson.id === activeLessonId;
-                           return (
-                             <div 
-                               key={lesson.id}
-                               onClick={() => !lesson.isLocked && setCurrentLessonId(lesson.id)}
-                               className={`
-                                 flex items-start gap-3 p-4 cursor-pointer transition-colors relative
-                                 ${lesson.isCompleted ? 'bg-green-50 hover:bg-green-100' : ''}
-                                 ${isActive && !lesson.isCompleted ? 'bg-brand-surface' : ''}
-                                 ${!isActive && !lesson.isCompleted ? 'hover:bg-slate-50' : ''}
-                                 ${lesson.isLocked ? 'opacity-50 pointer-events-none' : ''}
-                               `}
-                             >
-                               {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-accent"></div>}
-                               
-                               <div className="mt-0.5 flex-shrink-0">
-                                  {lesson.isCompleted ? (
-                                     <CheckCircle size={16} className="text-green-500" />
-                                  ) : lesson.isLocked ? (
-                                     <Lock size={16} className="text-slate-400" />
-                                  ) : (
-                                     <>
-                                       {lesson.type === 'video' && <PlayCircle size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />}
-                                       {lesson.type === 'text' && <BookOpen size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />}
-                                       {lesson.type === 'test' && <HelpCircle size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />}
-                                     </>
-                                  )}
-                               </div>
-                               <div className="flex-1">
-                                  <div className={`text-sm font-medium leading-tight mb-1 ${lesson.isCompleted ? 'text-green-700' : ''} ${isActive ? 'text-brand-dark font-bold' : 'text-slate-600'}`}>
-                                     {lesson.title}
-                                  </div>
-                                  <div className={`text-xs flex items-center gap-2 ${lesson.isCompleted ? 'text-green-600' : 'text-slate-400'}`}>
-                                     <Clock size={10}/>
-                                     {lesson.duration}
-                                     {lesson.type === 'test' && (
-                                       <>
-                                         <span className="mx-1">•</span>
-                                         <HelpCircle size={10}/>
-                                         {lesson.questions?.length || 0} pytań
-                                       </>
-                                     )}
-                                  </div>
-                               </div>
-                             </div>
-                           )
-                         })}
-                      </div>
-                   </div>
-                ))}
-             </div>
-          </div>
-
-        </div>
       </div>
     );
   }
@@ -6777,6 +6676,41 @@ const App = () => {
         </GuardianPanelLayout>
       ) : currentView === 'NEW_STUDENT_PANEL' ? (
         <NewStudentPanelView />
+      ) : currentView === 'LESSON_PLAYER' ? (
+        <div className="min-h-screen bg-slate-50">
+          <PanelHeader
+            logo={<BrandMark onClick={() => setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG')} />}
+            sections={[
+              { label: 'Moje szkolenia', onClick: () => setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG') },
+              ...(isFromAdmin && adminEditingCourseId
+                ? [
+                    {
+                      label: 'Powrót do edycji',
+                      onClick: () => {
+                        localStorage.setItem('returnToEditCourseId', adminEditingCourseId);
+                        setIsFromAdmin(false);
+                        setAdminEditingCourseId(null);
+                        setView('NEW_ADMIN_PANEL');
+                      },
+                    },
+                  ]
+                : []),
+              ...(isLoggedIn
+                ? [
+                    {
+                      label: 'Wyloguj',
+                      onClick: handleLogout,
+                    },
+                  ]
+                : []),
+            ]}
+            profileEmail={currentUser?.email}
+          />
+          <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+            <LessonPlayerView />
+            <PanelFooter />
+          </div>
+        </div>
       ) : (
         <Layout 
           currentView={currentView} 
@@ -6794,7 +6728,6 @@ const App = () => {
             {currentView === 'HOME' && <HomeView />}
             {currentView === 'CATALOG' && <CatalogView />}
             {currentView === 'COURSE_DETAIL' && <CourseDetailView />}
-            {currentView === 'LESSON_PLAYER' && <LessonPlayerView />}
             {currentView === 'RENTALS' && <RentalsView />}
             {currentView === 'MACHINE_DETAIL' && <MachineDetailView />}
             {currentView === 'SERVICES' && <ServicesView />}
