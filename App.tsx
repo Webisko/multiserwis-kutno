@@ -2013,13 +2013,19 @@ const App = () => {
     // Znajdź aktualną lekcję
     const currentLesson = allLessons[currentLessonIndex];
 
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const completedLessonsCount = allLessons.filter((lesson) => lesson.isCompleted).length;
+    const progressPercent = allLessons.length ? Math.round((completedLessonsCount / allLessons.length) * 100) : 0;
+    const activeSidebarLessonId = currentLesson?.id || activeLessonId;
+
     const handleBack = () => {
       setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG');
     };
 
     return (
-      <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-        <div className="min-w-0 flex flex-col gap-6 font-body animate-fade-in">
+      <div className="w-full flex flex-col md:flex-row gap-6">
+        <div className="min-w-0 flex-1 flex flex-col gap-6 font-body animate-fade-in order-2 md:order-1">
           <div className="flex items-start justify-between gap-4">
             <div>
               <button
@@ -2037,19 +2043,29 @@ const App = () => {
               <h1 className="mt-1 text-2xl font-heading font-bold text-slate-900">{currentLesson?.title || 'Lekcja'}</h1>
             </div>
 
-            {isFromAdmin && adminEditingCourseId ? (
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => {
-                  localStorage.setItem('returnToEditCourseId', adminEditingCourseId);
-                  setIsFromAdmin(false);
-                  setAdminEditingCourseId(null);
-                  setView('NEW_ADMIN_PANEL');
-                }}
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-brand-accent text-white font-bold text-sm rounded-sm hover:bg-brand-accentHover transition-colors"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden p-2 rounded-sm border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+                aria-label={sidebarOpen ? 'Ukryj spis lekcji' : 'Pokaż spis lekcji'}
               >
-                <ChevronRight size={16} className="rotate-180" /> Powrót do edycji
+                <Menu size={20} className="text-slate-600" />
               </button>
-            ) : null}
+
+              {isFromAdmin && adminEditingCourseId ? (
+                <button
+                  onClick={() => {
+                    localStorage.setItem('returnToEditCourseId', adminEditingCourseId);
+                    setIsFromAdmin(false);
+                    setAdminEditingCourseId(null);
+                    setView('NEW_ADMIN_PANEL');
+                  }}
+                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-brand-accent text-white font-bold text-sm rounded-sm hover:bg-brand-accentHover transition-colors"
+                >
+                  <ChevronRight size={16} className="rotate-180" /> Powrót do edycji
+                </button>
+              ) : null}
+            </div>
           </div>
 
             {/* Lesson Content - Video, Text, or Test */}
@@ -2406,39 +2422,97 @@ const App = () => {
             )}
         </div>
 
-        <aside className="hidden lg:block">
-          <div className="sticky top-24 bg-white rounded-sm shadow-sm border border-slate-200 p-4">
-            <div className="text-xs font-black uppercase tracking-wide text-slate-500">Moduły i lekcje</div>
-            <div className="mt-4 space-y-5">
-              {modulesForCourse.map((module) => (
-                <div key={module.id}>
-                  <div className="text-sm font-black text-brand-dark">{module.title}</div>
-                  <div className="mt-2 space-y-1">
-                    {module.lessons.map((lesson) => {
-                      const isActive = lesson.id === currentLesson?.id;
-                      return (
-                        <button
-                          key={lesson.id}
-                          onClick={() => setCurrentLessonId(lesson.id)}
-                          className={`w-full text-left px-3 py-2 rounded-sm border transition-colors flex items-center gap-2 ${
-                            isActive
-                              ? 'bg-brand-primary text-white border-brand-primary'
-                              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                          }`}
-                        >
-                          <span className="flex-1 truncate text-sm font-bold">{lesson.title}</span>
-                          {lesson.isCompleted ? (
-                            <CheckCircle size={16} className={isActive ? 'text-white' : 'text-green-600'} />
-                          ) : null}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+        {/* Sidebar - Right/Bottom on mobile */}
+        <div
+          className={
+            `
+             w-full md:w-1/4 flex-shrink-0 bg-white border border-slate-200 shadow-sm rounded-sm order-1 md:order-2
+             md:sticky md:top-20 md:max-h-[calc(100vh-6rem)] md:overflow-hidden md:flex md:flex-col
+             ${sidebarOpen ? 'block' : 'hidden md:flex'}
+          `
+          }
+        >
+          <div className="p-4 bg-brand-primary text-white rounded-t-sm flex-shrink-0">
+            <div className="text-xs font-bold uppercase text-brand-accent tracking-widest mb-1">Twój postęp</div>
+            <div className="flex justify-between items-end mb-2">
+              <span className="text-2xl font-heading font-bold">{progressPercent}%</span>
+              <span className="text-xs text-slate-300 mb-1">ukończono</span>
+            </div>
+            <div className="w-full bg-brand-dark/50 rounded-full h-1.5">
+              <div className="bg-brand-accent h-1.5 rounded-full" style={{ width: `${progressPercent}%` }}></div>
             </div>
           </div>
-        </aside>
+
+          <div className="overflow-y-auto flex-1">
+            {modulesForCourse.map((module) => (
+              <div key={module.id} className="border-b border-slate-100 last:border-0">
+                <div className="bg-slate-50 px-4 py-3 text-xs font-bold uppercase text-slate-600 tracking-wider flex justify-between items-center sticky top-0 z-10 border-b border-slate-200">
+                  {module.title}
+                </div>
+                <div>
+                  {module.lessons.map((lesson) => {
+                    const isActive = lesson.id === activeSidebarLessonId;
+                    return (
+                      <div
+                        key={lesson.id}
+                        onClick={() => !lesson.isLocked && setCurrentLessonId(lesson.id)}
+                        className={
+                          `
+                            flex items-start gap-3 p-4 cursor-pointer transition-colors relative
+                            ${lesson.isCompleted ? 'bg-green-50 hover:bg-green-100' : ''}
+                            ${isActive && !lesson.isCompleted ? 'bg-brand-surface' : ''}
+                            ${!isActive && !lesson.isCompleted ? 'hover:bg-slate-50' : ''}
+                            ${lesson.isLocked ? 'opacity-50 pointer-events-none' : ''}
+                          `
+                        }
+                      >
+                        {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-accent"></div>}
+
+                        <div className="mt-0.5 flex-shrink-0">
+                          {lesson.isCompleted ? (
+                            <CheckCircle size={16} className="text-green-500" />
+                          ) : lesson.isLocked ? (
+                            <Lock size={16} className="text-slate-400" />
+                          ) : (
+                            <>
+                              {lesson.type === 'video' && (
+                                <PlayCircle size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />
+                              )}
+                              {lesson.type === 'text' && (
+                                <BookOpen size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />
+                              )}
+                              {lesson.type === 'test' && (
+                                <HelpCircle size={16} className={`${isActive ? 'text-brand-accent' : 'text-slate-400'}`} />
+                              )}
+                            </>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div
+                            className={`text-sm font-medium leading-tight mb-1 ${lesson.isCompleted ? 'text-green-700' : ''} ${isActive ? 'text-brand-dark font-bold' : 'text-slate-600'}`}
+                          >
+                            {lesson.title}
+                          </div>
+                          <div className={`text-xs flex items-center gap-2 ${lesson.isCompleted ? 'text-green-600' : 'text-slate-400'}`}>
+                            <Clock size={10} />
+                            {lesson.duration}
+                            {lesson.type === 'test' && (
+                              <>
+                                <span className="mx-1">•</span>
+                                <HelpCircle size={10} />
+                                {lesson.questions?.length || 0} pytań
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
