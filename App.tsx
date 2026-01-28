@@ -6804,7 +6804,6 @@ const App = () => {
             variant="sidebar"
             logo={<BrandMark onClick={() => setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG')} />}
             sections={[
-              { label: 'Moje szkolenia', onClick: () => setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG') },
               ...(isFromAdmin && adminEditingCourseId
                 ? [
                     {
