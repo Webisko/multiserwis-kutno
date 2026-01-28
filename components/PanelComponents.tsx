@@ -26,6 +26,7 @@ interface PanelHeaderProps {
   profileEmail?: string;
   notificationCount?: number;
   notifications?: Notification[];
+  variant?: 'light' | 'sidebar';
 }
 
 export const PanelHeader: React.FC<PanelHeaderProps> = ({
@@ -35,7 +36,8 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
   onProfile,
   profileEmail,
   notificationCount = 0,
-  notifications = []
+  notifications = [],
+  variant = 'light'
 }) => {
   const [showProfileMenu, setShowProfileMenu] = React.useState(false);
   const [showNotificationsMenu, setShowNotificationsMenu] = React.useState(false);
@@ -77,15 +79,32 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
     error: 'border-l-red-500 bg-red-50'
   };
 
+  const isSidebar = variant === 'sidebar';
+  const headerClassName = isSidebar
+    ? 'sticky top-0 z-40 bg-brand-primary border-b border-brand-secondary/40 shadow-xl text-white'
+    : 'sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm';
+
+  const brandClassName = isSidebar
+    ? 'text-xl font-heading font-bold text-white'
+    : 'text-xl font-heading font-bold text-brand-dark';
+
+  const sectionButtonClassName = isSidebar
+    ? 'text-sm font-bold text-slate-200 hover:text-white transition-colors'
+    : 'text-sm font-bold text-slate-600 hover:text-brand-accent transition-colors';
+
+  const iconButtonClassName = isSidebar
+    ? 'relative p-2 text-slate-200 hover:text-white transition-colors'
+    : 'relative p-2 text-slate-600 hover:text-brand-accent transition-colors';
+
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
+    <header className={headerClassName}>
       <div className="max-w-full mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
         {/* Logo / Brand */}
         <div className="flex items-center gap-8">
           {logo ? (
             logo
           ) : (
-            <div className="text-xl font-heading font-bold text-brand-dark">MultiSerwis</div>
+            <div className={brandClassName}>MultiSerwis</div>
           )}
         </div>
 
@@ -95,7 +114,7 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
             <button
               key={idx}
               onClick={section.onClick}
-              className="text-sm font-bold text-slate-600 hover:text-brand-accent transition-colors"
+              className={sectionButtonClassName}
             >
               {section.label}
             </button>
@@ -108,7 +127,7 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowNotificationsMenu(!showNotificationsMenu)}
-              className="relative p-2 text-slate-600 hover:text-brand-accent transition-colors"
+              className={iconButtonClassName}
               title="Powiadomienia"
             >
               <svg
@@ -203,7 +222,10 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="flex items-center gap-2 p-2 text-slate-600 hover:text-brand-accent transition-colors"
+              className={isSidebar
+                ? 'flex items-center gap-2 p-2 text-slate-200 hover:text-white transition-colors'
+                : 'flex items-center gap-2 p-2 text-slate-600 hover:text-brand-accent transition-colors'
+              }
             >
               <User size={18} />
               <ChevronDown size={16} />

@@ -1993,7 +1993,8 @@ const App = () => {
     });
 
     // Znajdź indeks aktualnej lekcji
-    const currentLessonIndex = allLessons.findIndex(lesson => lesson.id === activeLessonId);
+    const foundLessonIndex = allLessons.findIndex(lesson => lesson.id === activeLessonId);
+    const currentLessonIndex = foundLessonIndex === -1 ? 0 : foundLessonIndex;
     const hasPrevious = currentLessonIndex > 0;
     const hasNext = currentLessonIndex < allLessons.length - 1;
 
@@ -2012,32 +2013,44 @@ const App = () => {
     // Znajdź aktualną lekcję
     const currentLesson = allLessons[currentLessonIndex];
 
-    return (
-      <div className="w-full flex flex-col gap-6 font-body animate-fade-in">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-              <span>Moje szkolenia</span>
-              <ChevronRight size={12} />
-              <span>{activeCourseTitle}</span>
-            </div>
-            <h1 className="mt-1 text-2xl font-heading font-bold text-slate-900">{currentLesson?.title || 'Lekcja'}</h1>
-          </div>
+    const handleBack = () => {
+      setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG');
+    };
 
-          {isFromAdmin && adminEditingCourseId ? (
-            <button
-              onClick={() => {
-                localStorage.setItem('returnToEditCourseId', adminEditingCourseId);
-                setIsFromAdmin(false);
-                setAdminEditingCourseId(null);
-                setView('NEW_ADMIN_PANEL');
-              }}
-              className="hidden md:flex items-center gap-2 px-4 py-2 bg-brand-accent text-white font-bold text-sm rounded-sm hover:bg-brand-accentHover transition-colors"
-            >
-              <ChevronRight size={16} className="rotate-180" /> Powrót do edycji
-            </button>
-          ) : null}
-        </div>
+    return (
+      <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        <div className="min-w-0 flex flex-col gap-6 font-body animate-fade-in">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <button
+                onClick={handleBack}
+                className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-brand-dark transition-colors"
+              >
+                <ChevronRight size={16} className="rotate-180" /> Powrót
+              </button>
+
+              <div className="mt-2 text-xs text-slate-500 font-semibold flex items-center gap-1">
+                <span>Moje szkolenia</span>
+                <ChevronRight size={12} />
+                <span>{activeCourseTitle}</span>
+              </div>
+              <h1 className="mt-1 text-2xl font-heading font-bold text-slate-900">{currentLesson?.title || 'Lekcja'}</h1>
+            </div>
+
+            {isFromAdmin && adminEditingCourseId ? (
+              <button
+                onClick={() => {
+                  localStorage.setItem('returnToEditCourseId', adminEditingCourseId);
+                  setIsFromAdmin(false);
+                  setAdminEditingCourseId(null);
+                  setView('NEW_ADMIN_PANEL');
+                }}
+                className="hidden md:flex items-center gap-2 px-4 py-2 bg-brand-accent text-white font-bold text-sm rounded-sm hover:bg-brand-accentHover transition-colors"
+              >
+                <ChevronRight size={16} className="rotate-180" /> Powrót do edycji
+              </button>
+            ) : null}
+          </div>
 
             {/* Lesson Content - Video, Text, or Test */}
             {currentLesson?.type === 'video' && (
@@ -2391,6 +2404,41 @@ const App = () => {
               </button>
             </div>
             )}
+        </div>
+
+        <aside className="hidden lg:block">
+          <div className="sticky top-24 bg-white rounded-sm shadow-sm border border-slate-200 p-4">
+            <div className="text-xs font-black uppercase tracking-wide text-slate-500">Moduły i lekcje</div>
+            <div className="mt-4 space-y-5">
+              {modulesForCourse.map((module) => (
+                <div key={module.id}>
+                  <div className="text-sm font-black text-brand-dark">{module.title}</div>
+                  <div className="mt-2 space-y-1">
+                    {module.lessons.map((lesson) => {
+                      const isActive = lesson.id === currentLesson?.id;
+                      return (
+                        <button
+                          key={lesson.id}
+                          onClick={() => setCurrentLessonId(lesson.id)}
+                          className={`w-full text-left px-3 py-2 rounded-sm border transition-colors flex items-center gap-2 ${
+                            isActive
+                              ? 'bg-brand-primary text-white border-brand-primary'
+                              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span className="flex-1 truncate text-sm font-bold">{lesson.title}</span>
+                          {lesson.isCompleted ? (
+                            <CheckCircle size={16} className={isActive ? 'text-white' : 'text-green-600'} />
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
       </div>
     );
   }
@@ -6679,6 +6727,7 @@ const App = () => {
       ) : currentView === 'LESSON_PLAYER' ? (
         <div className="min-h-screen bg-slate-50">
           <PanelHeader
+            variant="sidebar"
             logo={<BrandMark onClick={() => setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG')} />}
             sections={[
               { label: 'Moje szkolenia', onClick: () => setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG') },
@@ -6706,7 +6755,7 @@ const App = () => {
             ]}
             profileEmail={currentUser?.email}
           />
-          <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
             <LessonPlayerView />
             <PanelFooter />
           </div>
