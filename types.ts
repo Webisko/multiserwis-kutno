@@ -8,9 +8,14 @@ export interface Course {
   category: 'UDT' | 'SEP' | 'BHP' | 'Inne';
   duration: string;
   price: string;
+  promoPrice?: string;
   image: string;
+  status?: 'published' | 'draft';
   isPopular?: boolean;
   description?: string; // Added for specific sales copy
+  seoTitle?: string;
+  seoDescription?: string;
+  seoImage?: string;
 }
 
 export interface Machine {

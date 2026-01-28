@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { ViewState, Language } from '../types';
-import { Menu, X, Phone, Mail, GraduationCap, Truck, User, HardHat, ChevronRight, BarChart3, Globe, Users, Shield, Building2 } from 'lucide-react';
+import {
+  Menu,
+  X,
+  Phone,
+  Mail,
+  GraduationCap,
+  Truck,
+  User,
+  HardHat,
+  ChevronRight,
+  BarChart3,
+  Globe,
+  Shield,
+  Building2
+} from 'lucide-react';
 import { TRANSLATIONS } from '../constants';
+import { BrandMark } from './BrandMark';
 
 // Helper function for image paths (kept simple to avoid env typing issues)
 const getImagePath = (filename: string) => filename;
@@ -17,17 +32,15 @@ interface LayoutProps {
   isLoggedIn?: boolean;
   userName?: string;
   onLogout?: () => void;
-  onShowShowcase?: () => void;
   onShowNewPanel?: (panel: 'admin' | 'manager' | 'guardian' | 'student') => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, language, setLanguage, setCatalogCategory, onShowLoginModal, isLoggedIn, userName, onLogout, onShowShowcase, onShowNewPanel }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, language, setLanguage, setCatalogCategory, onShowLoginModal, isLoggedIn, userName, onLogout, onShowNewPanel }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
   const [trainingMenuOpen, setTrainingMenuOpen] = useState(false);
-  const [panelsMenuOpen, setPanelsMenuOpen] = useState(false);
   const [newPanelsMenuOpen, setNewPanelsMenuOpen] = useState(false);
 
   const t = TRANSLATIONS[language].nav;
@@ -93,46 +106,48 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
       <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-brand-primary shadow-xl py-3' : 'bg-brand-primary/95 backdrop-blur-sm py-5'}`}>
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex justify-between items-center">
           {/* Logo Area */}
-          <div 
-            className="flex items-center gap-2 cursor-pointer group" 
-            onClick={() => setView('HOME')}
-          >
-            <div className="w-10 h-10 bg-brand-accent rounded-sm flex items-center justify-center transform group-hover:rotate-45 transition-transform duration-300 p-1">
-              <img src={getImagePath('logo.svg')} alt="MultiSerwis Logo" className="w-full h-full scale-[0.85] group-hover:scale-100 transform group-hover:-rotate-45 transition-transform duration-300" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-heading font-extrabold text-white leading-none tracking-tight">MULTI<span className="text-brand-accent">SERWIS</span></span>
-              <span className="text-[10px] text-slate-300 font-medium tracking-[0.2em] uppercase leading-none mt-1">Profesjonalne Szkolenia</span>
-            </div>
-          </div>
+          <BrandMark onClick={() => setView('HOME')} />
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            
             {/* Szkolenia Dropdown */}
-            <div 
+            <div
               className="relative group"
               onMouseEnter={() => setTrainingMenuOpen(true)}
               onMouseLeave={() => setTrainingMenuOpen(false)}
             >
               <span onClick={() => setView('CATALOG')} className={`${navItemClass('CATALOG')} flex items-center gap-1`}>
-                {t.catalog} <ChevronRight size={14} className={`transform transition-transform ${trainingMenuOpen ? 'rotate-90' : ''}`}/>
+                {t.catalog}{' '}
+                <ChevronRight size={14} className={`transform transition-transform ${trainingMenuOpen ? 'rotate-90' : ''}`} />
               </span>
-              
+
               {trainingMenuOpen && (
                 <div className="absolute left-0 top-full pt-2 w-56 z-50">
                   <div className="bg-white rounded-sm shadow-xl border border-slate-200 overflow-hidden">
-                    <div 
-                      onClick={() => { setCatalogCategory('Wszystkie'); setView('CATALOG'); setTrainingMenuOpen(false); }}
+                    <div
+                      onClick={() => {
+                        setCatalogCategory('Wszystkie');
+                        setView('CATALOG');
+                        setTrainingMenuOpen(false);
+                      }}
                       className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
                     >
                       <GraduationCap size={16} /> Wszystkie szkolenia
                     </div>
                     <div className="border-t border-slate-100"></div>
-                    {[{name: 'UDT', label: 'Urządzenia UDT'}, {name: 'SEP', label: 'Uprawnienia SEP'}, {name: 'BHP', label: 'BHP i PPOŻ'}, {name: 'Inne', label: 'Maszyny Budowlane'}].map((category) => (
-                      <div 
+                    {[
+                      { name: 'UDT', label: 'Urządzenia UDT' },
+                      { name: 'SEP', label: 'Uprawnienia SEP' },
+                      { name: 'BHP', label: 'BHP i PPOŻ' },
+                      { name: 'Inne', label: 'Maszyny Budowlane' }
+                    ].map((category) => (
+                      <div
                         key={category.name}
-                        onClick={() => { setCatalogCategory(category.label); setView('CATALOG'); setTrainingMenuOpen(false); }}
+                        onClick={() => {
+                          setCatalogCategory(category.label);
+                          setView('CATALOG');
+                          setTrainingMenuOpen(false);
+                        }}
                         className="px-4 py-2 text-sm text-slate-600 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors"
                       >
                         Szkolenia {category.name}
@@ -142,28 +157,38 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                 </div>
               )}
             </div>
-            
+
             {/* Usługi Dropdown */}
-            <div 
+            <div
               className="relative group"
               onMouseEnter={() => setServicesMenuOpen(true)}
               onMouseLeave={() => setServicesMenuOpen(false)}
             >
-              <span className={`cursor-pointer text-sm font-bold uppercase tracking-wider transition-colors duration-300 ${currentView === 'RENTALS' || currentView === 'SERVICES' ? 'text-brand-accent' : 'text-white hover:text-brand-accent'} flex items-center gap-1`}>
-                Usługi <ChevronRight size={14} className={`transform transition-transform ${servicesMenuOpen ? 'rotate-90' : ''}`}/>
+              <span
+                className={`cursor-pointer text-sm font-bold uppercase tracking-wider transition-colors duration-300 ${
+                  currentView === 'RENTALS' || currentView === 'SERVICES' ? 'text-brand-accent' : 'text-white hover:text-brand-accent'
+                } flex items-center gap-1`}
+              >
+                Usługi <ChevronRight size={14} className={`transform transition-transform ${servicesMenuOpen ? 'rotate-90' : ''}`} />
               </span>
-              
+
               {servicesMenuOpen && (
                 <div className="absolute left-0 top-full pt-2 w-56 z-50">
                   <div className="bg-white rounded-sm shadow-xl border border-slate-200 overflow-hidden">
-                    <div 
-                      onClick={() => { setView('RENTALS'); setServicesMenuOpen(false); }}
+                    <div
+                      onClick={() => {
+                        setView('RENTALS');
+                        setServicesMenuOpen(false);
+                      }}
                       className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
                     >
                       <Truck size={16} /> Wynajem maszyn
                     </div>
-                    <div 
-                      onClick={() => { setView('SERVICES'); setServicesMenuOpen(false); }}
+                    <div
+                      onClick={() => {
+                        setView('SERVICES');
+                        setServicesMenuOpen(false);
+                      }}
                       className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
                     >
                       <HardHat size={16} /> Serwis i konserwacja
@@ -172,22 +197,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                 </div>
               )}
             </div>
-            
-            <span onClick={() => setView('CONTACT')} className={navItemClass('CONTACT')}>{t.contact}</span>
-            
-            {/* Showcase Button */}
-            {onShowShowcase && (
-              <button 
-                onClick={onShowShowcase}
-                className="px-4 py-2 rounded-sm font-bold text-xs uppercase tracking-wide transition-all bg-purple-600 text-white hover:bg-purple-700 shadow-lg flex items-center gap-2"
-                title="Pokaż nowy design paneli"
-              >
-                🎨 Showcase
-              </button>
-            )}
-            
+
+            <span onClick={() => setView('CONTACT')} className={navItemClass('CONTACT')}>
+              {t.contact}
+            </span>
+
             {!isLoggedIn ? (
-              <button 
+              <button
                 onClick={onShowLoginModal}
                 className="px-5 py-2 rounded-sm font-bold text-sm uppercase tracking-wide transition-all bg-brand-accent text-white hover:bg-brand-accentHover shadow-lg"
               >
@@ -197,7 +213,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
             ) : (
               <div className="flex items-center gap-4">
                 <span className="text-white text-sm font-bold">{userName}</span>
-                <button 
+                <button
                   onClick={onLogout}
                   className="px-4 py-2 rounded-sm font-bold text-xs uppercase tracking-wide bg-brand-accent text-white hover:bg-brand-accentHover transition-colors"
                 >
@@ -205,48 +221,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                 </button>
               </div>
             )}
-            
-            {/* Panele Dropdown */}
-            <div 
-              className="relative group"
-              onMouseEnter={() => setPanelsMenuOpen(true)}
-              onMouseLeave={() => setPanelsMenuOpen(false)}
-            >
-              <span className={`cursor-pointer text-sm font-bold uppercase tracking-wider transition-colors duration-300 ${currentView === 'ADMIN_PANEL' || currentView === 'LMS' || currentView === 'COMPANY_GUARDIAN_PANEL' ? 'text-brand-accent' : 'text-white hover:text-brand-accent'} flex items-center gap-1`}>
-                Panele <ChevronRight size={14} className={`transform transition-transform ${panelsMenuOpen ? 'rotate-90' : ''}`}/>
-              </span>
-              
-              {panelsMenuOpen && (
-                <div className="absolute right-0 top-full pt-2 w-64 z-50">
-                  <div className="bg-white rounded-sm shadow-xl border border-slate-200 overflow-hidden">
-                    <div 
-                      onClick={() => { setView('ADMIN_PANEL'); setPanelsMenuOpen(false); }}
-                      className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
-                    >
-                      <Shield size={16} /> Panel administratora
-                    </div>
-                    <div 
-                      onClick={() => { setView('ADMIN'); setPanelsMenuOpen(false); }}
-                      className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
-                    >
-                      <BarChart3 size={16} /> Panel managera
-                    </div>
-                    <div 
-                      onClick={() => { setView('COMPANY_GUARDIAN_PANEL'); setPanelsMenuOpen(false); }}
-                      className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
-                    >
-                      <Building2 size={16} /> Strefa opiekuna firmy
-                    </div>
-                    <div 
-                      onClick={() => { setView('LMS'); setPanelsMenuOpen(false); }}
-                      className="px-4 py-3 text-sm font-bold text-slate-700 hover:bg-brand-accent hover:text-white cursor-pointer transition-colors flex items-center gap-2"
-                    >
-                      <GraduationCap size={16} /> Strefa kursanta
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
 
             {/* Nowe Panele Dropdown */}
             {onShowNewPanel && (
@@ -306,23 +280,42 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 w-full bg-brand-primary border-t border-brand-secondary/50 shadow-2xl">
             <div className="flex flex-col p-4 space-y-4">
-              
               {/* Szkolenia Mobile */}
               <div className="border-b border-brand-secondary/30">
-                <div 
+                <div
                   onClick={() => setTrainingMenuOpen(!trainingMenuOpen)}
                   className="text-white font-bold py-2 flex items-center justify-between cursor-pointer"
                 >
-                  <span className="flex items-center gap-2"><GraduationCap size={16}/> {t.catalog}</span>
-                  <ChevronRight size={16} className={`transform transition-transform ${trainingMenuOpen ? 'rotate-90' : ''}`}/>
+                  <span className="flex items-center gap-2">
+                    <GraduationCap size={16} /> {t.catalog}
+                  </span>
+                  <ChevronRight size={16} className={`transform transition-transform ${trainingMenuOpen ? 'rotate-90' : ''}`} />
                 </div>
                 {trainingMenuOpen && (
                   <div className="pl-6 py-2 space-y-2">
-                    <div onClick={() => { setCatalogCategory('Wszystkie'); setView('CATALOG'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1">Wszystkie szkolenia</div>
-                    {[{name: 'UDT', label: 'Urządzenia UDT'}, {name: 'SEP', label: 'Uprawnienia SEP'}, {name: 'BHP', label: 'BHP i PPOŻ'}, {name: 'Inne', label: 'Maszyny Budowlane'}].map((category) => (
-                      <div 
+                    <div
+                      onClick={() => {
+                        setCatalogCategory('Wszystkie');
+                        setView('CATALOG');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="text-slate-300 text-sm py-1"
+                    >
+                      Wszystkie szkolenia
+                    </div>
+                    {[
+                      { name: 'UDT', label: 'Urządzenia UDT' },
+                      { name: 'SEP', label: 'Uprawnienia SEP' },
+                      { name: 'BHP', label: 'BHP i PPOŻ' },
+                      { name: 'Inne', label: 'Maszyny Budowlane' }
+                    ].map((category) => (
+                      <div
                         key={category.name}
-                        onClick={() => { setCatalogCategory(category.label); setView('CATALOG'); setMobileMenuOpen(false); }}
+                        onClick={() => {
+                          setCatalogCategory(category.label);
+                          setView('CATALOG');
+                          setMobileMenuOpen(false);
+                        }}
                         className="text-slate-300 text-sm py-1"
                       >
                         Szkolenia {category.name}
@@ -331,86 +324,77 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView, 
                   </div>
                 )}
               </div>
-              
+
               {/* Usługi Mobile */}
               <div className="border-b border-brand-secondary/30">
-                <div 
+                <div
                   onClick={() => setServicesMenuOpen(!servicesMenuOpen)}
                   className="text-white font-bold py-2 flex items-center justify-between cursor-pointer"
                 >
-                  <span className="flex items-center gap-2"><Truck size={16}/> Usługi</span>
-                  <ChevronRight size={16} className={`transform transition-transform ${servicesMenuOpen ? 'rotate-90' : ''}`}/>
+                  <span className="flex items-center gap-2">
+                    <Truck size={16} /> Usługi
+                  </span>
+                  <ChevronRight size={16} className={`transform transition-transform ${servicesMenuOpen ? 'rotate-90' : ''}`} />
                 </div>
                 {servicesMenuOpen && (
                   <div className="pl-6 py-2 space-y-2">
-                    <div onClick={() => { setView('RENTALS'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
-                      <Truck size={14}/> Wynajem maszyn
+                    <div
+                      onClick={() => {
+                        setView('RENTALS');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="text-slate-300 text-sm py-1 flex items-center gap-2"
+                    >
+                      <Truck size={14} /> Wynajem maszyn
                     </div>
-                    <div onClick={() => { setView('SERVICES'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
-                      <HardHat size={14}/> Serwis i konserwacja
+                    <div
+                      onClick={() => {
+                        setView('SERVICES');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="text-slate-300 text-sm py-1 flex items-center gap-2"
+                    >
+                      <HardHat size={14} /> Serwis i konserwacja
                     </div>
                   </div>
                 )}
               </div>
-              
-              <span onClick={() => { setView('CONTACT'); setMobileMenuOpen(false); }} className="text-white font-bold py-2 border-b border-brand-secondary/30">{t.contact}</span>
-              
-              {/* Showcase Button Mobile */}
-              {onShowShowcase && (
-                <button 
-                  onClick={() => { onShowShowcase(); setMobileMenuOpen(false); }}
-                  className="text-white font-bold py-2 border-b border-brand-secondary/30 flex items-center gap-2 bg-purple-600 px-4 rounded"
-                >
-                  🎨 Showcase Nowego Designu
-                </button>
-              )}
-              
+
+              <span
+                onClick={() => {
+                  setView('CONTACT');
+                  setMobileMenuOpen(false);
+                }}
+                className="text-white font-bold py-2 border-b border-brand-secondary/30"
+              >
+                {t.contact}
+              </span>
+
               {/* Login/Logout Mobile */}
               {!isLoggedIn ? (
-                <button 
-                  onClick={() => { onShowLoginModal?.(); setMobileMenuOpen(false); }}
+                <button
+                  onClick={() => {
+                    onShowLoginModal?.();
+                    setMobileMenuOpen(false);
+                  }}
                   className="text-white font-bold py-2 border-b border-brand-secondary/30 flex items-center gap-2 bg-brand-accent px-4 rounded"
                 >
-                  <User size={16}/> Zaloguj
+                  <User size={16} /> Zaloguj
                 </button>
               ) : (
                 <div className="flex items-center justify-between border-b border-brand-secondary/30 pb-2">
                   <span className="text-white text-sm font-bold">{userName}</span>
-                  <button 
-                    onClick={() => { onLogout?.(); setMobileMenuOpen(false); }}
+                  <button
+                    onClick={() => {
+                      onLogout?.();
+                      setMobileMenuOpen(false);
+                    }}
                     className="px-4 py-2 rounded-sm font-bold text-xs uppercase bg-brand-accent text-white hover:bg-brand-accentHover"
                   >
                     Wyloguj
                   </button>
                 </div>
               )}
-              
-              {/* Panele Mobile */}
-              <div className="border-b border-brand-secondary/30">
-                <div 
-                  onClick={() => setPanelsMenuOpen(!panelsMenuOpen)}
-                  className="text-white font-bold py-2 flex items-center justify-between cursor-pointer"
-                >
-                  <span className="flex items-center gap-2"><Users size={16}/> Panele</span>
-                  <ChevronRight size={16} className={`transform transition-transform ${panelsMenuOpen ? 'rotate-90' : ''}`}/>
-                </div>
-                {panelsMenuOpen && (
-                  <div className="pl-6 py-2 space-y-2">
-                    <div onClick={() => { setView('ADMIN_PANEL'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
-                      <Shield size={14}/> Panel administratora
-                    </div>
-                    <div onClick={() => { setView('ADMIN'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
-                      <BarChart3 size={14}/> Panel managera
-                    </div>
-                    <div onClick={() => { setView('COMPANY_GUARDIAN_PANEL'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
-                      <Building2 size={14}/> Strefa opiekuna firmy
-                    </div>
-                    <div onClick={() => { setView('LMS'); setMobileMenuOpen(false); }} className="text-slate-300 text-sm py-1 flex items-center gap-2">
-                      <GraduationCap size={14}/> Strefa kursanta
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* Nowe Panele Mobile */}
               {onShowNewPanel && (

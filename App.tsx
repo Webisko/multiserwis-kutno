@@ -4,8 +4,43 @@ import { Layout } from './components/Layout';
 import SectionHeader from './components/SectionHeader';
 import ImagePicker from './components/ImagePicker';
 import LessonTextEditor from './components/LessonTextEditor';
-import { PanelShowcase } from './components/PanelShowcase';
 import { PanelHeader, PanelTabs, StatCard, PanelTable, PanelLayout, SectionHeader as PanelSectionHeader } from './components/PanelComponents';
+import { AdminPanelLayout } from './components/admin/AdminPanelLayout';
+import type { AdminSectionId } from './components/admin/AdminPanelLayout';
+import { AdminDashboard } from './components/admin/AdminDashboard';
+import { AdminCourseEdit } from './components/admin/AdminCourseEdit';
+import { AdminUsers } from './components/admin/AdminUsers';
+import { AdminCompanies } from './components/admin/AdminCompanies';
+import { AdminFinance } from './components/admin/AdminFinance';
+import { AdminReports } from './components/admin/AdminReports';
+import { AdminSettings } from './components/admin/AdminSettings';
+import { AdminPermissions } from './components/admin/AdminPermissions';
+import { ManagerPanelLayout } from './components/manager/ManagerPanelLayout';
+import type { ManagerSectionId } from './components/manager/ManagerPanelLayout';
+import { ManagerDashboard } from './components/manager/ManagerDashboard';
+import { ManagerCourseEdit } from './components/manager/ManagerCourseEdit';
+import { ManagerFinance } from './components/manager/ManagerFinance';
+import { ManagerReports } from './components/manager/ManagerReports';
+import { ManagerSettings } from './components/manager/ManagerSettings';
+import { GuardianPanelLayout } from './components/guardian/GuardianPanelLayout';
+import type { GuardianSectionId } from './components/guardian/GuardianPanelLayout';
+import { GuardianDashboard } from './components/guardian/GuardianDashboard';
+import { GuardianReports } from './components/guardian/GuardianReports';
+import { GuardianSettings } from './components/guardian/GuardianSettings';
+import { StudentPanelLayout, type StudentSectionId } from './components/student/StudentPanelLayout';
+import { StudentDashboard } from './components/student/StudentDashboard';
+import { StudentMyCoursesPage } from './components/student/StudentMyCoursesPage';
+import { StudentCertificationsPage } from './components/student/StudentCertificationsPage';
+import { StudentExamsPage } from './components/student/StudentExamsPage';
+import { CoursesCatalog } from './components/panel/CoursesCatalog';
+import { TrainingPreviewPage } from './components/panel/TrainingPreviewPage';
+import { UserProfileView, type UserOverrides } from './components/panel/UserProfileView';
+import { UserEdit } from './components/panel/UserEdit';
+import { UserCreatePage } from './components/panel/UserCreatePage';
+import { CompanyView, type CompanyOverrides } from './components/panel/CompanyView';
+import { CompanyEdit } from './components/panel/CompanyEdit';
+import { CompanyCreatePage } from './components/panel/CompanyCreatePage';
+import { NotificationsCenter } from './components/panel/NotificationsCenter';
 import { COURSES, MACHINES, MY_COURSES, COURSE_CURRICULUM, ADMIN_STUDENTS, POPULARITY_DATA, TRANSLATIONS, SEO_DATA } from './constants';
 import { 
   ChevronRight, 
@@ -49,7 +84,7 @@ import {
   Plus,
   TrendingUp
 } from 'lucide-react';
-import { StudentUser, UserRole, CompanyGuardianReport, Employee } from './types';
+import { StudentUser, UserRole, CompanyGuardianReport, Employee, Student } from './types';
 
 type NewPanelKey = 'admin' | 'manager' | 'guardian' | 'student';
 
@@ -66,15 +101,193 @@ const App = () => {
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [adminActiveTab, setAdminActiveTab] = useState<'dashboard' | 'courses' | 'students'>('dashboard');
   const [adminViewingCourseId, setAdminViewingCourseId] = useState<string | null>(null);
+  const [adminPanelSection, setAdminPanelSection] = useState<AdminSectionId>('dashboard');
+  const [managerPanelSection, setManagerPanelSection] = useState<ManagerSectionId>('dashboard');
+  const [guardianPanelSection, setGuardianPanelSection] = useState<GuardianSectionId>('dashboard');
+  const [managerEditingCourseId, setManagerEditingCourseId] = useState<string | null>(null);
+  const [adminPreviewCourseId, setAdminPreviewCourseId] = useState<string | null>(null);
+  const [managerPreviewCourseId, setManagerPreviewCourseId] = useState<string | null>(null);
+  const [guardianPreviewCourseId, setGuardianPreviewCourseId] = useState<string | null>(null);
+  const [adminSelectedUserEmail, setAdminSelectedUserEmail] = useState<string | null>(null);
+  const [adminSelectedCompanyName, setAdminSelectedCompanyName] = useState<string | null>(null);
+  const [managerSelectedUserEmail, setManagerSelectedUserEmail] = useState<string | null>(null);
+  const [managerSelectedCompanyName, setManagerSelectedCompanyName] = useState<string | null>(null);
+  const [guardianSelectedUserEmail, setGuardianSelectedUserEmail] = useState<string | null>(null);
+  const [panelUserOverrides, setPanelUserOverrides] = useState<Record<string, UserOverrides>>({});
+  const [panelCompanyOverrides, setPanelCompanyOverrides] = useState<Record<string, CompanyOverrides>>({});
+  const [panelCourses, setPanelCourses] = useState<Course[]>(COURSES);
+  const [panelHiddenUsers, setPanelHiddenUsers] = useState<string[]>([]);
+  const [panelHiddenCompanies, setPanelHiddenCompanies] = useState<string[]>([]);
+  const [panelExtraStudents, setPanelExtraStudents] = useState<Student[]>([]);
   const [quizAnswers, setQuizAnswers] = useState<{ [key: string]: number | number[] | string }>({});
   const [showQuizResults, setShowQuizResults] = useState(false);
   const [openAccordionIndex, setOpenAccordionIndex] = useState<number | null>(null);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [lmsTab, setLmsTab] = useState<'courses' | 'certifications' | 'examHistory'>('courses');
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
-  const [showShowcase, setShowShowcase] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [guardianTab, setGuardianTab] = useState<'employees' | 'reports'>('employees');
+
+  React.useEffect(() => {
+    // Legacy panels are intentionally hidden; if something tries to navigate there, send the user back to HOME.
+    if (currentView === 'ADMIN_PANEL' || currentView === 'ADMIN' || currentView === 'LMS' || currentView === 'COMPANY_GUARDIAN_PANEL') {
+      setView('HOME');
+    }
+  }, [currentView]);
+
+  const handleDeleteUser = (email: string) => {
+    setPanelHiddenUsers((prev) => (prev.includes(email) ? prev : [...prev, email]));
+  };
+
+  const panelStudents = React.useMemo(() => {
+    return [...ADMIN_STUDENTS, ...panelExtraStudents];
+  }, [panelExtraStudents]);
+
+  const handleCreatePanelUser = (payload: {
+    email: string;
+    name: string;
+    company: string;
+    courseId: string;
+    phone?: string;
+    address?: string;
+    idNumber?: string;
+    pesel?: string;
+    avatarUrl?: string;
+  }): { ok: true } | { ok: false; error: string } => {
+    const email = payload.email.trim();
+    const normalized = email.toLowerCase();
+    const exists = panelStudents.some((s) => s.email.trim().toLowerCase() === normalized);
+    if (exists) {
+      return { ok: false, error: 'Użytkownik o takim emailu już istnieje.' };
+    }
+
+    const newStudent: Student = {
+      id: `s_custom_${Date.now()}`,
+      name: payload.name.trim() || email,
+      email,
+      company: payload.company.trim() || 'Indywidualny',
+      course: payload.courseId,
+      progress: 0,
+      expirationDays: 60,
+      status: 'active',
+      completedLessons: []
+    };
+
+    setPanelExtraStudents((prev) => [newStudent, ...prev]);
+    saveUserOverrides(email, {
+      email,
+      name: payload.name.trim() || email,
+      company: payload.company.trim() || 'Indywidualny',
+      phone: payload.phone,
+      address: payload.address,
+      idNumber: payload.idNumber,
+      pesel: payload.pesel,
+      avatarUrl: payload.avatarUrl
+    });
+
+    return { ok: true };
+  };
+
+  const handleCreatePanelUsersBulk = (
+    payloads: Array<{
+      email: string;
+      name: string;
+      company: string;
+      courseId: string;
+      phone?: string;
+      address?: string;
+      idNumber?: string;
+      pesel?: string;
+      avatarUrl?: string;
+      __rowNumber?: number;
+    }>
+  ):
+    | { ok: true; created: number; skipped: Array<{ row: number; email?: string; reason: string }> }
+    | { ok: false; error: string } => {
+    if (!payloads.length) return { ok: false, error: 'Brak rekordów do importu.' };
+
+    const existingEmails = new Set(panelStudents.map((s) => s.email.trim().toLowerCase()));
+    const seenInFile = new Set<string>();
+
+    const skipped: Array<{ row: number; email?: string; reason: string }> = [];
+    const newStudents: Student[] = [];
+    const newOverrides: Record<string, UserOverrides> = {};
+
+    payloads.forEach((p, idx) => {
+      const rowNumber = typeof p.__rowNumber === 'number' ? p.__rowNumber : idx + 2; // fallback assumes header is row 1
+      const email = (p.email || '').trim();
+      const normalized = email.toLowerCase();
+      if (!email) {
+        skipped.push({ row: rowNumber, reason: 'Brak emaila.' });
+        return;
+      }
+      if (existingEmails.has(normalized)) {
+        skipped.push({ row: rowNumber, email, reason: 'Email już istnieje w systemie.' });
+        return;
+      }
+      if (seenInFile.has(normalized)) {
+        skipped.push({ row: rowNumber, email, reason: 'Duplikat emaila w pliku importu.' });
+        return;
+      }
+      seenInFile.add(normalized);
+
+      const name = (p.name || '').trim() || email;
+      const company = (p.company || '').trim() || 'Indywidualny';
+      const courseId = (p.courseId || '').trim();
+      if (!courseId) {
+        skipped.push({ row: rowNumber, email, reason: 'Brak courseId (ID szkolenia).' });
+        return;
+      }
+      if (!panelCourses.some((c) => c.id === courseId)) {
+        skipped.push({ row: rowNumber, email, reason: `Nieznane courseId: ${courseId}` });
+        return;
+      }
+
+      newStudents.push({
+        id: `s_custom_${Date.now()}_${idx}`,
+        name,
+        email,
+        company,
+        course: courseId,
+        progress: 0,
+        expirationDays: 60,
+        status: 'active',
+        completedLessons: []
+      });
+
+      newOverrides[email] = {
+        email,
+        name,
+        company,
+        phone: p.phone,
+        address: p.address,
+        idNumber: p.idNumber,
+        pesel: p.pesel,
+        avatarUrl: p.avatarUrl
+      };
+    });
+
+    if (!newStudents.length) {
+      const sample = skipped[0]
+        ? `Przykład: wiersz ${skipped[0].row}${skipped[0].email ? ` (${skipped[0].email})` : ''} – ${skipped[0].reason}`
+        : '';
+      return {
+        ok: false,
+        error: skipped.length
+          ? `Nie udało się dodać żadnego rekordu. Sprawdź błędy w imporcie. ${sample}`.trim()
+          : 'Brak poprawnych rekordów.'
+      };
+    }
+
+    setPanelExtraStudents((prev) => [...newStudents, ...prev]);
+    setPanelUserOverrides((prev) => ({ ...prev, ...newOverrides }));
+
+    return { ok: true, created: newStudents.length, skipped };
+  };
+
+  const handleDeleteCompany = (companyName: string) => {
+    setPanelHiddenCompanies((prev) => (prev.includes(companyName) ? prev : [...prev, companyName]));
+  };
 
   // --- SYSTEM ROL UŻYTKOWNIKÓW ---
   const [currentUser, setCurrentUser] = useState<StudentUser | null>(null);
@@ -334,13 +547,16 @@ const App = () => {
       
       // Routing na podstawie roli
       if (user.user.role === 'ADMIN') {
-        setView('ADMIN_PANEL');
+        setAdminPanelSection('dashboard');
+        setView('NEW_ADMIN_PANEL');
       } else if (user.user.role === 'MANAGER') {
-        setView('ADMIN');
+        setManagerPanelSection('dashboard');
+        setView('NEW_MANAGER_PANEL');
       } else if (user.user.role === 'STUDENT') {
-        setView('LMS');
+        setView('NEW_STUDENT_PANEL');
       } else if (user.user.role === 'COMPANY_GUARDIAN') {
-        setView('COMPANY_GUARDIAN_PANEL');
+        setGuardianPanelSection('dashboard');
+        setView('NEW_GUARDIAN_PANEL');
       }
     } else {
       alert('Błędny email lub hasło');
@@ -362,6 +578,93 @@ const App = () => {
       student: 'NEW_STUDENT_PANEL'
     };
     setView(viewMap[panel]);
+  };
+
+  const getNextCourseId = (courses: Course[]) => {
+    const numbers = courses
+      .map((c) => c.id)
+      .map((id) => {
+        const match = id.match(/^c(\d+)$/);
+        return match ? Number(match[1]) : null;
+      })
+      .filter((n): n is number => n !== null);
+
+    const next = (numbers.length ? Math.max(...numbers) : 0) + 1;
+    return `c${next}`;
+  };
+
+  const createBlankCourse = (existing: Course[]): Course => {
+    const fallbackImage = existing[0]?.image || '';
+    return {
+      id: getNextCourseId(existing),
+      title: 'Nowe szkolenie',
+      category: 'UDT',
+      duration: '0h',
+      price: '0 PLN',
+      promoPrice: '',
+      image: fallbackImage,
+      status: 'draft',
+      description: ''
+    };
+  };
+
+  const handleCreateCourse = (context: 'admin' | 'manager') => {
+    setPanelCourses((prev) => {
+      const created = createBlankCourse(prev);
+      if (context === 'admin') {
+        setAdminEditingCourseId(created.id);
+        setAdminPanelSection('course-create');
+      } else {
+        setManagerEditingCourseId(created.id);
+        setManagerPanelSection('course-create');
+      }
+      return [created, ...prev];
+    });
+  };
+
+  const handleSaveCourse = (updated: Course) => {
+    setPanelCourses((prev) => {
+      const exists = prev.some((c) => c.id === updated.id);
+      if (!exists) return [updated, ...prev];
+      return prev.map((c) => (c.id === updated.id ? updated : c));
+    });
+  };
+
+  const handleDeleteCourse = (courseId: string) => {
+    setPanelCourses((prev) => prev.filter((c) => c.id !== courseId));
+    setAdminEditingCourseId((prev) => (prev === courseId ? null : prev));
+    setManagerEditingCourseId((prev) => (prev === courseId ? null : prev));
+  };
+
+  const openCoursePreview = (courseId: string) => {
+    const firstLessonId = COURSE_CURRICULUM.find((m) => m.courseId === courseId)?.lessons?.[0]?.id;
+    setSelectedCourseId(courseId);
+    if (firstLessonId) setCurrentLessonId(firstLessonId);
+    setIsFromAdmin(false);
+    setView('LESSON_PLAYER');
+  };
+
+  const openAdminTrainingPreview = (courseId: string) => {
+    setAdminPreviewCourseId(courseId);
+    setAdminPanelSection('course-preview');
+  };
+
+  const openManagerTrainingPreview = (courseId: string) => {
+    setManagerPreviewCourseId(courseId);
+    setManagerPanelSection('course-preview');
+  };
+
+  const openGuardianTrainingPreview = (courseId: string) => {
+    setGuardianPreviewCourseId(courseId);
+    setGuardianPanelSection('course-preview');
+  };
+
+  const saveUserOverrides = (email: string, overrides: UserOverrides) => {
+    setPanelUserOverrides((prev) => ({ ...prev, [email]: overrides }));
+  };
+
+  const saveCompanyOverrides = (companyName: string, overrides: CompanyOverrides) => {
+    setPanelCompanyOverrides((prev) => ({ ...prev, [companyName]: overrides }));
   };
 
   // Get program details for each course
@@ -1670,9 +1973,19 @@ const App = () => {
     const activeLessonId = currentLessonId; 
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
+    const modulesForCourse = selectedCourseId
+      ? COURSE_CURRICULUM.filter((m) => m.courseId === selectedCourseId)
+      : COURSE_CURRICULUM;
+
+    const activeCourseTitle = selectedCourseId
+      ? panelCourses.find((c) => c.id === selectedCourseId)?.title ||
+        COURSES.find((c) => c.id === selectedCourseId)?.title ||
+        'Szkolenie'
+      : 'Szkolenie';
+
     // Znajdź wszystkie lekcje w kursie
     const allLessons: any[] = [];
-    COURSE_CURRICULUM.forEach(module => {
+    modulesForCourse.forEach(module => {
       module.lessons.forEach(lesson => {
         allLessons.push(lesson);
       });
@@ -1709,8 +2022,14 @@ const App = () => {
             <div className="flex items-center justify-between">
                <div>
                   <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
-                     <span onClick={() => setView('LMS')} className="cursor-pointer hover:text-brand-accent">Moje Szkolenia</span> <ChevronRight size={12}/> 
-                     <span>Operator Wózków Widłowych (I WJO)</span>
+                    <span
+                      onClick={() => setView(isLoggedIn ? 'NEW_STUDENT_PANEL' : 'CATALOG')}
+                      className="cursor-pointer hover:text-brand-accent"
+                    >
+                      Moje Szkolenia
+                    </span>{' '}
+                    <ChevronRight size={12} /> 
+                    <span>{activeCourseTitle}</span>
                   </div>
                   <h1 className="text-2xl font-heading font-bold text-brand-dark">{currentLesson?.title || 'Bezpieczeństwo wymiany butli LPG'}</h1>
                </div>
@@ -1723,7 +2042,7 @@ const App = () => {
                         
                         setIsFromAdmin(false);
                         setAdminEditingCourseId(null);
-                        setView('ADMIN');
+                        setView('NEW_ADMIN_PANEL');
                       }}
                       className="hidden md:flex items-center gap-2 px-4 py-2 bg-brand-accent text-white font-bold text-sm rounded-sm hover:bg-brand-accentHover transition-colors"
                     >
@@ -2112,7 +2431,7 @@ const App = () => {
              </div>
 
              <div className="overflow-y-auto flex-1">
-                {COURSE_CURRICULUM.map((module) => (
+                 {modulesForCourse.map((module) => (
                    <div key={module.id} className="border-b border-slate-100 last:border-0">
                       <div className="bg-slate-50 px-4 py-3 text-xs font-bold uppercase text-slate-600 tracking-wider flex justify-between items-center sticky top-0 z-10 border-b border-slate-200">
                          {module.title}
@@ -4674,7 +4993,7 @@ const App = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-2">Email</label>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">E-mail</label>
                       <input
                         type="email"
                         defaultValue="jan.kowalski@abc-transport.pl"
@@ -5511,7 +5830,7 @@ const App = () => {
           <PanelHeader
             sections={[
               { label: 'Dashboard', onClick: () => setActiveTab('dashboard') },
-              { label: 'Kursy', onClick: () => setActiveTab('courses') },
+              { label: 'Szkolenia', onClick: () => setActiveTab('courses') },
               { label: 'Użytkownicy', onClick: () => setActiveTab('users') },
               { label: 'Raporty', onClick: () => setActiveTab('reports') }
             ]}
@@ -5536,7 +5855,7 @@ const App = () => {
               trend={{ value: 12, isPositive: true }}
             />
             <StatCard
-              title="Kursy"
+              title="Szkolenia"
               value="18"
               subtitle="Dostępnych szkoleń"
               icon={<GraduationCap size={20} />}
@@ -5582,7 +5901,7 @@ const App = () => {
           <PanelHeader
             sections={[
               { label: 'Przegląd', onClick: () => setActiveTab('overview') },
-              { label: 'Kursy', onClick: () => setActiveTab('courses') },
+              { label: 'Szkolenia', onClick: () => setActiveTab('courses') },
               { label: 'Statystyki', onClick: () => setActiveTab('stats') }
             ]}
             profileEmail="manager@multiserwis.pl"
@@ -5593,7 +5912,7 @@ const App = () => {
         <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
           <PanelSectionHeader
             title="Panel Managera - Nowa Wersja"
-            subtitle="Nadzór nad kursami i użytkownikami"
+            subtitle="Nadzór nad szkoleniami i użytkownikami"
           />
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
@@ -5605,7 +5924,7 @@ const App = () => {
               variant="admin"
             />
             <StatCard
-              title="Kursy w toku"
+              title="Szkolenia w toku"
               value="12"
               subtitle="Aktywne szkolenia"
               icon={<GraduationCap size={20} />}
@@ -5754,70 +6073,133 @@ const App = () => {
 
   const NewStudentPanelView = () => {
     const studentUser = currentUser ?? demoStudent;
+    const [studentPanelSection, setStudentPanelSection] = React.useState<StudentSectionId>('dashboard');
+    const [studentPreviewCourseId, setStudentPreviewCourseId] = React.useState<string | null>(null);
+
+    const openStudentTrainingPreview = (courseId: string) => {
+      setStudentPreviewCourseId(courseId);
+      setStudentPanelSection('course-preview');
+    };
+
+    const continueStudentCourse = (courseId: string) => {
+      const normalize = (value: string) =>
+        (value || '')
+          .trim()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/\s+/g, ' ');
+
+      const email = (studentUser?.email || '').trim().toLowerCase();
+      const studentRecord = email ? panelStudents.find((s) => s.email.trim().toLowerCase() === email) : undefined;
+      const lessons = COURSE_CURRICULUM.find((m) => m.courseId === courseId)?.lessons || [];
+      const completed = new Set(studentRecord?.completedLessons || []);
+      const firstIncompleteLessonId = lessons.find((l) => !completed.has(l.id))?.id;
+      const fallbackLessonId = lessons[0]?.id;
+
+      const enrollment = MY_COURSES.find((uc) => uc.courseId === courseId);
+      const desiredTitle = enrollment?.nextLesson ? normalize(enrollment.nextLesson) : '';
+      const desiredLessonId =
+        desiredTitle
+          ? lessons.find((l) => normalize(l.title) === desiredTitle)?.id ||
+            lessons.find((l) => normalize(l.title).includes(desiredTitle) || desiredTitle.includes(normalize(l.title)))
+              ?.id
+          : undefined;
+
+      setSelectedCourseId(courseId);
+      if (desiredLessonId) setCurrentLessonId(desiredLessonId);
+      else if (firstIncompleteLessonId) setCurrentLessonId(firstIncompleteLessonId);
+      else if (fallbackLessonId) setCurrentLessonId(fallbackLessonId);
+      setIsFromAdmin(false);
+      setView('LESSON_PLAYER');
+    };
     
     return (
-      <PanelLayout
-        header={
-          <PanelHeader
-            sections={[
-              { label: 'Moje Kursy', onClick: () => setLmsTab('courses') },
-              { label: 'Certyfikaty', onClick: () => setLmsTab('certifications') },
-              { label: 'Historia', onClick: () => setLmsTab('examHistory') }
-            ]}
-            profileEmail={studentUser?.email || "student@multiserwis.pl"}
-            notificationCount={1}
-          />
-        }
+      <StudentPanelLayout
+        activeSection={studentPanelSection}
+        onSectionChange={setStudentPanelSection}
+        userName={studentUser?.name || 'Kursant'}
+        userRole="Kursant"
+        onLogoClick={() => setView('HOME')}
+        onLogout={() => {
+          setCurrentUser(null);
+          setView('HOME');
+        }}
       >
-        <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
-          <PanelSectionHeader
-            title="Strefa Kursanta - Nowa Wersja"
-            subtitle={`Witaj, ${studentUser?.name || 'Kursant'}!`}
+        {studentPanelSection === 'dashboard' && studentUser && (
+          <StudentDashboard
+            studentUser={studentUser}
+            courses={panelCourses}
+            myCourses={MY_COURSES}
+            onContinueLearning={() => setStudentPanelSection('my-courses')}
+            onGoToCatalog={() => setStudentPanelSection('catalog')}
+            onGoToCertifications={() => setStudentPanelSection('certifications')}
           />
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-            <StatCard
-              title="Moje Kursy"
-              value="5"
-              subtitle="W trakcie nauki"
-              icon={<GraduationCap size={20} />}
-              variant="client"
-            />
-            <StatCard
-              title="Certyfikaty"
-              value="3"
-              subtitle="Zdobyte"
-              icon={<Award size={20} />}
-              variant="client"
-            />
-            <StatCard
-              title="Średni Postęp"
-              value="68%"
-              subtitle="Wszystkich kursów"
-              icon={<TrendingUp size={20} />}
-              variant="client"
-              trend={{ value: 8, isPositive: true }}
-            />
-            <StatCard
-              title="Wygasające"
-              value="2"
-              subtitle="Certyfikaty do odnowienia"
-              icon={<Clock size={20} />}
-              variant="client"
-            />
-          </div>
-        </div>
+        )}
 
-        <div className="bg-white rounded-sm shadow-sm p-6">
-          <PanelSectionHeader
-            title="Moje aktywne kursy"
-            subtitle="Kontynuuj naukę"
+        {studentPanelSection === 'catalog' && (
+          <CoursesCatalog
+            title="Katalog szkoleń"
+            subtitle="Przeglądaj szkolenia dostępne w systemie."
+            courses={panelCourses}
+            onPreviewCourse={openStudentTrainingPreview}
           />
-          <div className="mt-4 text-slate-500 text-center py-8">
-            Lista aktywnych kursów kursanta
+        )}
+
+        {studentPanelSection === 'course-preview' && (
+          <TrainingPreviewPage
+            training={panelCourses.find((c) => c.id === studentPreviewCourseId) || null}
+            onBack={() => setStudentPanelSection('catalog')}
+            onStart={openCoursePreview}
+          />
+        )}
+
+        {studentPanelSection === 'profile-view' && studentUser?.email && (
+          <UserProfileView
+            email={studentUser.email}
+            courses={panelCourses}
+            students={panelStudents}
+            overrides={panelUserOverrides}
+            onBack={() => setStudentPanelSection('dashboard')}
+            onEdit={() => setStudentPanelSection('profile-edit')}
+          />
+        )}
+
+        {studentPanelSection === 'profile-edit' && studentUser?.email && (
+          <UserEdit
+            email={studentUser.email}
+            students={panelStudents}
+            overrides={panelUserOverrides}
+            onSaveOverrides={saveUserOverrides}
+            hideCompanyField
+            onBack={() => setStudentPanelSection('profile-view')}
+          />
+        )}
+
+        {studentPanelSection === 'my-courses' && (
+          <StudentMyCoursesPage
+            courses={panelCourses}
+            myCourses={MY_COURSES}
+            onPreviewCourse={openStudentTrainingPreview}
+            onContinueCourse={continueStudentCourse}
+          />
+        )}
+
+        {studentPanelSection === 'certifications' && (
+          <StudentCertificationsPage studentUser={studentUser} />
+        )}
+
+        {studentPanelSection === 'exams' && (
+          <StudentExamsPage studentUser={studentUser} />
+        )}
+
+        {studentPanelSection === 'settings' && (
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h1 className="text-2xl font-bold text-slate-900">Ustawienia</h1>
+            <p className="text-sm text-slate-500 mt-1">Ustawienia konta (do wdrożenia).</p>
           </div>
-        </div>
-      </PanelLayout>
+        )}
+      </StudentPanelLayout>
     );
   };
 
@@ -5907,6 +6289,14 @@ const App = () => {
     );
   };
 
+  const adminCourseToEdit = adminEditingCourseId
+    ? panelCourses.find((course) => course.id === adminEditingCourseId) || null
+    : null;
+
+  const managerCourseToEdit = managerEditingCourseId
+    ? panelCourses.find((course) => course.id === managerEditingCourseId) || null
+    : null;
+
   return (
     <>
       {/* Modal logowania */}
@@ -5962,43 +6352,457 @@ const App = () => {
         </div>
       )}
 
-      <Layout 
-        currentView={currentView} 
-        setView={setView} 
-        language={language} 
-        setLanguage={setLanguage} 
-        setCatalogCategory={setCatalogCategory}
-        onShowLoginModal={() => setShowLoginModal(true)}
-        isLoggedIn={isLoggedIn}
-        userName={currentUser?.name}
-        onLogout={handleLogout}
-        onShowShowcase={() => setShowShowcase(true)}
-        onShowNewPanel={handleShowNewPanel}
-      >
-        {showShowcase ? (
-          <PanelShowcase onClose={() => setShowShowcase(false)} />
-        ) : (
+      {currentView === 'NEW_ADMIN_PANEL' ? (
+        <AdminPanelLayout
+          activeSection={adminPanelSection}
+          onSectionChange={setAdminPanelSection}
+          onLogoClick={() => setView('HOME')}
+          userName={currentUser?.name || 'Administrator'}
+          userRole="Superadministrator"
+          onLogout={handleLogout}
+        >
+          {adminPanelSection === 'dashboard' && (
+            <AdminDashboard onNavigate={setAdminPanelSection} />
+          )}
+          {adminPanelSection === 'courses' && (
+            <CoursesCatalog
+              courses={panelCourses}
+              onCreateCourse={() => handleCreateCourse('admin')}
+              onEditCourse={(courseId) => {
+                setAdminEditingCourseId(courseId);
+                setAdminPanelSection('course-edit');
+              }}
+              onPreviewCourse={openAdminTrainingPreview}
+              onDeleteCourse={(courseId) => {
+                handleDeleteCourse(courseId);
+              }}
+            />
+          )}
+          {adminPanelSection === 'course-preview' && (
+            <TrainingPreviewPage
+              training={panelCourses.find((c) => c.id === adminPreviewCourseId) || null}
+              onBack={() => setAdminPanelSection('courses')}
+              onEdit={() => {
+                if (!adminPreviewCourseId) return;
+                setAdminEditingCourseId(adminPreviewCourseId);
+                setAdminPanelSection('course-edit');
+              }}
+              onStart={openCoursePreview}
+            />
+          )}
+          {(adminPanelSection === 'course-edit' || adminPanelSection === 'course-create') && (
+            <AdminCourseEdit
+              course={adminCourseToEdit}
+              onBack={() => setAdminPanelSection('courses')}
+              onSave={handleSaveCourse}
+              onPreview={openAdminTrainingPreview}
+              intent={adminPanelSection === 'course-create' ? 'create' : 'edit'}
+            />
+          )}
+          {adminPanelSection === 'users' && (
+            <AdminUsers
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              hiddenEmails={panelHiddenUsers}
+              onAddClick={() => setAdminPanelSection('user-create')}
+              onViewUser={(email) => {
+                setAdminSelectedUserEmail(email);
+                setAdminPanelSection('user-view');
+              }}
+              onEditUser={(email) => {
+                setAdminSelectedUserEmail(email);
+                setAdminPanelSection('user-edit');
+              }}
+              onDeleteUser={handleDeleteUser}
+            />
+          )}
+
+          {adminPanelSection === 'user-create' && (
+            <UserCreatePage
+              title="Dodawanie użytkownika"
+              subtitle="Dodaj pojedynczą osobę lub zaimportuj wiele osób z CSV."
+              courses={panelCourses}
+              students={panelStudents}
+              onBack={() => setAdminPanelSection('users')}
+              onCreateUser={handleCreatePanelUser}
+              onCreateUsersBulk={handleCreatePanelUsersBulk}
+            />
+          )}
+          {adminPanelSection === 'user-view' && adminSelectedUserEmail && (
+            <UserProfileView
+              email={adminSelectedUserEmail}
+              courses={panelCourses}
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              onBack={() => setAdminPanelSection('users')}
+              onEdit={() => setAdminPanelSection('user-edit')}
+            />
+          )}
+          {adminPanelSection === 'user-edit' && adminSelectedUserEmail && (
+            <UserEdit
+              email={adminSelectedUserEmail}
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              onSaveOverrides={saveUserOverrides}
+              onBack={() => setAdminPanelSection('user-view')}
+            />
+          )}
+
+          {adminPanelSection === 'companies' && (
+            <AdminCompanies
+              overrides={panelCompanyOverrides}
+              hiddenCompanies={panelHiddenCompanies}
+              onAddClick={() => {
+                setAdminSelectedCompanyName(null);
+                setAdminPanelSection('company-create');
+              }}
+              onViewCompany={(companyName) => {
+                setAdminSelectedCompanyName(companyName);
+                setAdminPanelSection('company-view');
+              }}
+              onEditCompany={(companyName) => {
+                setAdminSelectedCompanyName(companyName);
+                setAdminPanelSection('company-edit');
+              }}
+              onDeleteCompany={handleDeleteCompany}
+            />
+          )}
+          {adminPanelSection === 'company-create' && (
+            <CompanyCreatePage
+              overrides={panelCompanyOverrides}
+              userOverrides={panelUserOverrides}
+              onCreate={saveCompanyOverrides}
+              onSaveUserOverrides={saveUserOverrides}
+              onCancel={() => setAdminPanelSection('companies')}
+              onCreated={(companyName) => {
+                setAdminSelectedCompanyName(companyName);
+                setAdminPanelSection('company-view');
+              }}
+            />
+          )}
+          {adminPanelSection === 'company-view' && adminSelectedCompanyName && (
+            <CompanyView
+              companyName={adminSelectedCompanyName}
+              courses={panelCourses}
+              overrides={panelCompanyOverrides}
+              userOverrides={panelUserOverrides}
+              onBack={() => setAdminPanelSection('companies')}
+              onEdit={() => setAdminPanelSection('company-edit')}
+            />
+          )}
+          {adminPanelSection === 'company-edit' && adminSelectedCompanyName && (
+            <CompanyEdit
+              companyName={adminSelectedCompanyName}
+              overrides={panelCompanyOverrides}
+              userOverrides={panelUserOverrides}
+              onSaveOverrides={saveCompanyOverrides}
+              onSaveUserOverrides={saveUserOverrides}
+              onBack={() => setAdminPanelSection('company-view')}
+            />
+          )}
+          {adminPanelSection === 'notifications' && <NotificationsCenter />}
+          {adminPanelSection === 'finance' && <AdminFinance courses={panelCourses} students={panelStudents} />}
+          {adminPanelSection === 'reports' && <AdminReports courses={panelCourses} students={panelStudents} />}
+          {adminPanelSection === 'settings' && <AdminSettings />}
+          {adminPanelSection === 'permissions' && <AdminPermissions />}
+        </AdminPanelLayout>
+      ) : currentView === 'NEW_MANAGER_PANEL' ? (
+        <ManagerPanelLayout
+          activeSection={managerPanelSection}
+          onSectionChange={setManagerPanelSection}
+          onLogoClick={() => setView('HOME')}
+          userName={currentUser?.name || 'Menedżer'}
+          userRole="Menedżer platformy"
+          onLogout={handleLogout}
+        >
+          {managerPanelSection === 'dashboard' && (
+            <ManagerDashboard courses={panelCourses} onNavigate={setManagerPanelSection} />
+          )}
+
+          {managerPanelSection === 'courses' && (
+            <CoursesCatalog
+              courses={panelCourses}
+              onCreateCourse={() => handleCreateCourse('manager')}
+              onEditCourse={(courseId) => {
+                setManagerEditingCourseId(courseId);
+                setManagerPanelSection('course-edit');
+              }}
+              onPreviewCourse={openManagerTrainingPreview}
+              onDeleteCourse={(courseId) => {
+                handleDeleteCourse(courseId);
+              }}
+            />
+          )}
+
+          {managerPanelSection === 'course-preview' && (
+            <TrainingPreviewPage
+              training={panelCourses.find((c) => c.id === managerPreviewCourseId) || null}
+              onBack={() => setManagerPanelSection('courses')}
+              onEdit={() => {
+                if (!managerPreviewCourseId) return;
+                setManagerEditingCourseId(managerPreviewCourseId);
+                setManagerPanelSection('course-edit');
+              }}
+              onStart={openCoursePreview}
+            />
+          )}
+
+          {(managerPanelSection === 'course-edit' || managerPanelSection === 'course-create') && (
+            <ManagerCourseEdit
+              course={managerCourseToEdit}
+              onBack={() => setManagerPanelSection('courses')}
+              onSave={handleSaveCourse}
+              onDelete={handleDeleteCourse}
+              onPreview={openManagerTrainingPreview}
+              intent={managerPanelSection === 'course-create' ? 'create' : 'edit'}
+            />
+          )}
+
+          {managerPanelSection === 'users' && (
+            <AdminUsers
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              hiddenEmails={panelHiddenUsers}
+              onAddClick={() => setManagerPanelSection('user-create')}
+              onViewUser={(email) => {
+                setManagerSelectedUserEmail(email);
+                setManagerPanelSection('user-view');
+              }}
+              onEditUser={(email) => {
+                setManagerSelectedUserEmail(email);
+                setManagerPanelSection('user-edit');
+              }}
+              onDeleteUser={handleDeleteUser}
+            />
+          )}
+
+          {managerPanelSection === 'user-create' && (
+            <UserCreatePage
+              title="Dodawanie użytkownika"
+              subtitle="Dodaj pojedynczą osobę lub zaimportuj wiele osób z CSV."
+              courses={panelCourses}
+              students={panelStudents}
+              onBack={() => setManagerPanelSection('users')}
+              onCreateUser={handleCreatePanelUser}
+              onCreateUsersBulk={handleCreatePanelUsersBulk}
+            />
+          )}
+          {managerPanelSection === 'user-view' && managerSelectedUserEmail && (
+            <UserProfileView
+              email={managerSelectedUserEmail}
+              courses={panelCourses}
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              onBack={() => setManagerPanelSection('users')}
+              onEdit={() => setManagerPanelSection('user-edit')}
+            />
+          )}
+          {managerPanelSection === 'user-edit' && managerSelectedUserEmail && (
+            <UserEdit
+              email={managerSelectedUserEmail}
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              onSaveOverrides={saveUserOverrides}
+              onBack={() => setManagerPanelSection('user-view')}
+            />
+          )}
+
+          {managerPanelSection === 'companies' && (
+            <AdminCompanies
+              overrides={panelCompanyOverrides}
+              hiddenCompanies={panelHiddenCompanies}
+              onAddClick={() => {
+                setManagerSelectedCompanyName(null);
+                setManagerPanelSection('company-create');
+              }}
+              onViewCompany={(companyName) => {
+                setManagerSelectedCompanyName(companyName);
+                setManagerPanelSection('company-view');
+              }}
+              onEditCompany={(companyName) => {
+                setManagerSelectedCompanyName(companyName);
+                setManagerPanelSection('company-edit');
+              }}
+              onDeleteCompany={handleDeleteCompany}
+            />
+          )}
+          {managerPanelSection === 'company-create' && (
+            <CompanyCreatePage
+              overrides={panelCompanyOverrides}
+              userOverrides={panelUserOverrides}
+              onCreate={saveCompanyOverrides}
+              onSaveUserOverrides={saveUserOverrides}
+              onCancel={() => setManagerPanelSection('companies')}
+              onCreated={(companyName) => {
+                setManagerSelectedCompanyName(companyName);
+                setManagerPanelSection('company-view');
+              }}
+            />
+          )}
+          {managerPanelSection === 'company-view' && managerSelectedCompanyName && (
+            <CompanyView
+              companyName={managerSelectedCompanyName}
+              courses={panelCourses}
+              overrides={panelCompanyOverrides}
+              userOverrides={panelUserOverrides}
+              onBack={() => setManagerPanelSection('companies')}
+              onEdit={() => setManagerPanelSection('company-edit')}
+            />
+          )}
+          {managerPanelSection === 'company-edit' && managerSelectedCompanyName && (
+            <CompanyEdit
+              companyName={managerSelectedCompanyName}
+              overrides={panelCompanyOverrides}
+              userOverrides={panelUserOverrides}
+              onSaveOverrides={saveCompanyOverrides}
+              onSaveUserOverrides={saveUserOverrides}
+              onBack={() => setManagerPanelSection('company-view')}
+            />
+          )}
+          {managerPanelSection === 'notifications' && <NotificationsCenter />}
+          {managerPanelSection === 'finance' && <ManagerFinance courses={panelCourses} students={panelStudents} />}
+          {managerPanelSection === 'reports' && <ManagerReports courses={panelCourses} students={panelStudents} />}
+          {managerPanelSection === 'settings' && <ManagerSettings />}
+        </ManagerPanelLayout>
+      ) : currentView === 'NEW_GUARDIAN_PANEL' ? (
+        <GuardianPanelLayout
+          activeSection={guardianPanelSection}
+          onSectionChange={setGuardianPanelSection}
+          onLogoClick={() => setView('HOME')}
+          userName={currentUser?.name || 'Opiekun firmy'}
+          userRole={currentUser?.company ? `Opiekun: ${currentUser.company}` : 'Opiekun firmy'}
+          onLogout={handleLogout}
+        >
+          {guardianPanelSection === 'dashboard' && (
+            <GuardianDashboard
+              companyName={currentUser?.company || demoGuardian?.company || 'Demo Sp. z o.o.'}
+              employeesCount={new Set(
+                panelStudents
+                  .filter((s) => (s.company || 'Indywidualny') === (currentUser?.company || demoGuardian?.company || 'Demo Sp. z o.o.'))
+                  .map((s) => s.email)
+              ).size}
+              trainingsCount={panelCourses.length}
+            />
+          )}
+
+          {guardianPanelSection === 'courses' && (
+            <CoursesCatalog
+              title="Szkolenia"
+              subtitle="Katalog szkoleń dostępnych dla firmy (podgląd)."
+              courses={panelCourses}
+              onPreviewCourse={openGuardianTrainingPreview}
+            />
+          )}
+
+          {guardianPanelSection === 'course-preview' && (
+            <TrainingPreviewPage
+              training={panelCourses.find((c) => c.id === guardianPreviewCourseId) || null}
+              onBack={() => setGuardianPanelSection('courses')}
+              onStart={openCoursePreview}
+            />
+          )}
+
+          {guardianPanelSection === 'employees' && (
+            <AdminUsers
+              title="Pracownicy"
+              subtitle="Lista pracowników firmy przypisanych do kursów."
+              addButtonLabel="Dodaj pracownika"
+              searchPlaceholder="Szukaj pracownika..."
+              countLabel="PRACOWNIKÓW"
+              forcedCompany={currentUser?.company || demoGuardian?.company || 'Demo Sp. z o.o.'}
+              hideCompanyColumn
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              hiddenEmails={panelHiddenUsers}
+              onAddClick={() => setGuardianPanelSection('employee-create')}
+              onViewUser={(email) => {
+                setGuardianSelectedUserEmail(email);
+                setGuardianPanelSection('employee-view');
+              }}
+              onEditUser={(email) => {
+                setGuardianSelectedUserEmail(email);
+                setGuardianPanelSection('employee-edit');
+              }}
+              onDeleteUser={handleDeleteUser}
+            />
+          )}
+
+          {guardianPanelSection === 'employee-create' && (
+            <UserCreatePage
+              title="Dodawanie pracownika"
+              subtitle="Dodaj pojedynczą osobę lub zaimportuj wiele osób z CSV."
+              courses={panelCourses}
+              students={panelStudents}
+              forcedCompany={currentUser?.company || demoGuardian?.company || 'Demo Sp. z o.o.'}
+              onBack={() => setGuardianPanelSection('employees')}
+              onCreateUser={handleCreatePanelUser}
+              onCreateUsersBulk={handleCreatePanelUsersBulk}
+            />
+          )}
+
+          {guardianPanelSection === 'employee-view' && guardianSelectedUserEmail && (
+            <UserProfileView
+              email={guardianSelectedUserEmail}
+              entityLabel="pracownika"
+              courses={panelCourses}
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              onBack={() => setGuardianPanelSection('employees')}
+              onEdit={() => setGuardianPanelSection('employee-edit')}
+            />
+          )}
+
+          {guardianPanelSection === 'employee-edit' && guardianSelectedUserEmail && (
+            <UserEdit
+              email={guardianSelectedUserEmail}
+              entityLabel="pracownika"
+              students={panelStudents}
+              overrides={panelUserOverrides}
+              onSaveOverrides={saveUserOverrides}
+              hideCompanyField
+              forcedCompany={currentUser?.company || demoGuardian?.company || 'Demo Sp. z o.o.'}
+              onBack={() => setGuardianPanelSection('employee-view')}
+            />
+          )}
+
+          {guardianPanelSection === 'reports' && (
+            <GuardianReports
+              courses={panelCourses}
+              students={panelStudents}
+              forcedCompany={currentUser?.company || demoGuardian?.company || 'Demo Sp. z o.o.'}
+            />
+          )}
+          {guardianPanelSection === 'notifications' && <NotificationsCenter />}
+          {guardianPanelSection === 'settings' && <GuardianSettings />}
+        </GuardianPanelLayout>
+      ) : currentView === 'NEW_STUDENT_PANEL' ? (
+        <NewStudentPanelView />
+      ) : (
+        <Layout 
+          currentView={currentView} 
+          setView={setView} 
+          language={language} 
+          setLanguage={setLanguage} 
+          setCatalogCategory={setCatalogCategory}
+          onShowLoginModal={() => setShowLoginModal(true)}
+          isLoggedIn={isLoggedIn}
+          userName={currentUser?.name}
+          onLogout={handleLogout}
+          onShowNewPanel={handleShowNewPanel}
+        >
           <>
             {currentView === 'HOME' && <HomeView />}
             {currentView === 'CATALOG' && <CatalogView />}
             {currentView === 'COURSE_DETAIL' && <CourseDetailView />}
-            {currentView === 'LMS' && <LMSView />}
             {currentView === 'LESSON_PLAYER' && <LessonPlayerView />}
             {currentView === 'RENTALS' && <RentalsView />}
             {currentView === 'MACHINE_DETAIL' && <MachineDetailView />}
             {currentView === 'SERVICES' && <ServicesView />}
             {currentView === 'CONTACT' && <ContactView />}
-            {currentView === 'ADMIN' && <AdminView />}
-            {currentView === 'ADMIN_PANEL' && <AdminPanelView />}
-            {currentView === 'COMPANY_GUARDIAN_PANEL' && <CompanyGuardianPanelView />}
-            {currentView === 'NEW_ADMIN_PANEL' && <NewAdminPanelView />}
-            {currentView === 'NEW_MANAGER_PANEL' && <NewManagerPanelView />}
-            {currentView === 'NEW_GUARDIAN_PANEL' && <NewGuardianPanelView />}
-            {currentView === 'NEW_STUDENT_PANEL' && <NewStudentPanelView />}
             {currentView === 'STUDENT_DETAIL' && <StudentDetailView />}
           </>
-        )}
-      </Layout>
+        </Layout>
+      )}
     </>
   );
 };

@@ -46,15 +46,15 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
     {
       id: '1',
       title: 'Nowy kursant',
-      message: 'Jan Kowalski zapisał się na kurs "Wózki Widłowe"',
+      message: 'Jan Kowalski zapisał się na szkolenie "Wózki Widłowe"',
       timestamp: '5 minut temu',
       read: false,
       type: 'info'
     },
     {
       id: '2',
-      title: 'Kurs ukończony',
-      message: 'Anna Nowak ukończyła kurs "BHP Podstawowe" z wynikiem 95%',
+      title: 'Szkolenie ukończone',
+      message: 'Anna Nowak ukończyła szkolenie "BHP Podstawowe" z wynikiem 95%',
       timestamp: '1 godzina temu',
       read: false,
       type: 'success'
